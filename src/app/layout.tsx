@@ -1,4 +1,5 @@
 import "./globals.css";
+import Header from "@/components/Header";
 
 export const metadata = {
   title: "BinBoard",
@@ -12,11 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className="min-h-screen bg-gray-50">
-        <header className="bg-emerald-900 text-white p-4 font-semibold">
-          BinBoard
-        </header>
-        <main className="max-w-6xl mx-auto p-6">{children}</main>
+      <body className="min-h-screen">
+        <Header />
+        {children}
       </body>
     </html>
   );
