@@ -24,3 +24,84 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Scrollbar minimal para tablas: solo la barra, sin fondo ni flechas */
+.bb-scroll {
+  /* Firefox */
+  scrollbar-width: thin;                 /* más fino */
+  scrollbar-color: #0b3b22 transparent;  /* thumb, track */
+}
+
+/* WebKit (Chrome, Edge, Safari) */
+.bb-scroll::-webkit-scrollbar {
+  height: 8px;           /* alto de la barra horizontal */
+  background: transparent; /* sin fondo blanco */
+}
+
+.bb-scroll::-webkit-scrollbar-track {
+  background: transparent; /* pista invisible */
+}
+
+.bb-scroll::-webkit-scrollbar-thumb {
+  background-color: #0b3b22; /* verde muy oscuro */
+  border-radius: 9999px;     /* pill */
+  border: 0 solid transparent;
+}
+
+/* Ocultar flechas y esquinas */
+.bb-scroll::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
+  display: none;
+}
+.bb-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Contenedor con scroll para tablas */
+.bb-scroll {
+  overflow: auto;
+  /* Firefox */
+  scrollbar-width: thin;                    /* fino pero visible */
+  scrollbar-color: #0b3b22 transparent;     /* thumb, track */
+}
+
+/* WebKit (Chrome/Edge/Safari) */
+.bb-scroll::-webkit-scrollbar {
+  height: 12px;  /* grosor horizontal */
+  width: 12px;   /* grosor vertical */
+  background: transparent;                  /* sin fondo */
+}
+.bb-scroll::-webkit-scrollbar-track {
+  background: transparent;                  /* pista invisible */
+}
+.bb-scroll::-webkit-scrollbar-thumb {
+  background-color: #0b3b22;                /* verde muy oscuro */
+  border-radius: 9999px;                    /* pill */
+  border: 0 solid transparent;
+}
+.bb-scroll::-webkit-scrollbar-button {      /* sin flechas */
+  width: 0;
+  height: 0;
+  display: none;
+}
+.bb-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Altura máx. de la tabla (~6 filas). Ajusta si tus filas son más altas/bajas */
+.bb-table-wrap {
+  max-height: 15rem; /* ~6 filas + header; sube/baja si lo necesitas */
+}
+
+/* (Opcional) Header sticky para que quede fijo al hacer scroll vertical */
+.bb-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  /* asegúrate de que el fondo del header cubre al scroll */
+  background: rgba(255,255,255,0.06); /* o el que uses en el header */
+  backdrop-filter: none;
+}
+
+
