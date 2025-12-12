@@ -5,6 +5,7 @@ import ChartWeekly from "@/components/ChartWeekly";
 import { supabaseServer } from "@/lib/supabase";
 import { buildPredicate } from "@/lib/ruleEngine";
 import HomeStixFooter from "./HomeStixFooter";
+import BinGridClient from "./BinGridClient";
 
 
 /* ===== Tipos ===== */
@@ -107,18 +108,8 @@ export default async function HomePage() {
         <ChartWeekly />
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 pb-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {binItems.map((b) => (
-            <BinCard key={b.name} name={b.name} count={b.count} href={b.href} />
-          ))}
-        </div>
-        {binItems.length === 0 && (
-          <div className="text-center text-emerald-900/80 mt-8">
-            No se han encontrado binarios en <code>rules</code>.
-          </div>
-        )}
-      </section>
+      <BinGridClient items={binItems} />
+
       <HomeStixFooter />
     </main>
   );

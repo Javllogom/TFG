@@ -1,12 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { writeEnvLocal } from "./actions";
+
 
 export default function DatabaseConfigForm() {
   const [url, setUrl] = useState("");
   const [anonKey, setAnonKey] = useState("");
   const [serviceKey, setServiceKey] = useState("");
   const [envContent, setEnvContent] = useState("");
+
+  const [applyStatus, setApplyStatus] = useState<"idle" | "ok" | "error">("idle");
+  const [isPending, startTransition] = useTransition();
+
+  const handleApply = () => {
+    setApplyStatus("idle");
+    startTransition(async () => {
+      try {
+        await writeEnvLocal({ url, anonKey, serviceRoleKey: serviceKey });
+        setApplyStatus("ok");
+      } catch (e) {
+        console.error(e);
+        setApplyStatus("error");
+      }
+    });
+  };
+
 
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,6 +119,29 @@ export default function DatabaseConfigForm() {
         >
           Generar configuración
         </button>
+        <button
+          type="button"
+          onClick={handleApply}
+          className="inline-flex items-center gap-2 rounded-full px-4 py-2 bg-[#0B3D06] text-[#F5F4CB] text-sm font-semibold border border-[#F5F4CB]/60 shadow-sm hover:bg-[#082d04] active:bg-[#061f03] transition"
+        >
+          {isPending ? "Aplicando..." : "Aplicar y sobrescribir .env.local"}
+        </button>
+
+        {applyStatus === "ok" && (
+          <div className="mt-3 rounded-md border border-emerald-900/20 bg-white/70 p-3 text-sm text-emerald-900">
+            ✅ Archivo <code>.env.local</code> actualizado.
+            <div className="mt-1">
+              Ahora reinicia el servidor: <code>Ctrl+C</code> y <code>npm run dev</code>.
+            </div>
+          </div>
+        )}
+
+        {applyStatus === "error" && (
+          <div className="mt-3 rounded-md border border-red-700/30 bg-red-50 p-3 text-sm text-red-800">
+            ❌ Error escribiendo <code>.env.local</code>. Revisa permisos o logs.
+          </div>
+        )}
+
       </form>
 
       {envContent && (

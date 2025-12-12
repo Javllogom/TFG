@@ -1,54 +1,97 @@
-'use client';
-import Link from 'next/link';
+import Link from "next/link";
 
-function badgeColor(count: number) {
-  if (count === 0) return '#FEFEFE';
-  if (count <= 2) return '#F6F39F';
-  if (count <= 5) return '#FDB994';
-  if (count <= 9) return '#D89191';
-  return '#E07B7B';
-}
+type Props = {
+  name: string;
+  count: number;
+  href: string;
+  variant?: "compact" | "default" | "wide";
+  description?: string;
+};
 
 export default function BinCard({
   name,
   count,
   href,
-}: {
-  name: string;
-  count: number;
-  href: string;
-}) {
+  variant = "default",
+  description,
+}: Props) {
+  const isCompact = variant === "compact";
+  const isWide = variant === "wide";
+
   return (
     <Link
       href={href}
-      className="group flex items-center justify-between rounded-xl px-4 py-3 transition border-2"
-      style={{
-        backgroundColor: '#166534',
-        borderColor: '#135B0A',
-        color: '#FFFFFF',
-      }}
+      className={[
+        "block rounded-xl border border-emerald-950/50 shadow-sm",
+        "bg-[#135B0A] text-[#F5F4CB]",
+        "px-4 py-3",
+        "hover:bg-[#0f3f0a] transition",
+      ].join(" ")}
     >
-      <div className="flex items-center gap-3">
-        <span
-          className="inline-flex items-center justify-center rounded-lg w-8 h-8 text-xs font-mono"
-          style={{ backgroundColor: 'rgba(0,0,0,0.15)' }}
-          aria-hidden
-        >
+      <div className="flex items-center gap-3 min-w-0">
+        {/* exe pill */}
+        <div className="flex-none rounded-lg bg-[#0B3D06] px-2 py-1 text-xs font-semibold">
           exe
-        </span>
-        <span className="font-bold text-lg">{name}</span>
-      </div>
+        </div>
 
-      <span
-        className="inline-flex items-center justify-center rounded-full w-9 h-9 font-bold"
-        style={{
-          backgroundColor: badgeColor(count),
-          color: '#000000', // números en negro
-        }}
-        aria-label={`Incidencias: ${count}`}
-      >
-        {count}
-      </span>
+        {/* content */}
+        {isWide ? (
+          <div className="min-w-0 flex-1 grid grid-cols-[minmax(100px,300px)_1px_1fr] items-center gap-4">
+            {/* Title column (fixed area) */}
+            <div className="min-w-0">
+              <div className="font-bold text-2xl leading-tight truncate" title={name}>
+                {name}
+              </div>
+            </div>
+
+            {/* Separator (fixed X position because of grid template) */}
+            <div className="self-stretch w-px bg-[#F5F4CB]/40" />
+
+            {/* Description (2 lines max, then ellipsis) */}
+            <div
+              className="min-w-0 text-sm text-[#F5F4CB]/90 leading-snug"
+              style={{
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+              title={description ?? ""}
+            >
+              {description ??
+                "Texto provisional: descripción breve del binario y su posible abuso."}
+            </div>
+          </div>
+        ) : (
+          <div className="min-w-0 flex-1">
+            <div
+              className={[
+                "font-bold truncate",
+                isCompact
+                  ? "text-[clamp(11px,1.0vw,16px)]"
+                  : "text-lg",
+              ].join(" ")}
+              title={name}
+            >
+              {name}
+            </div>
+          </div>
+        )}
+
+        {/* count badge (never shrink / never deform) */}
+        <div
+          className={[
+            "flex-none shrink-0",
+            "w-10 h-10 aspect-square rounded-full",
+            "grid place-items-center",
+            "font-bold text-sm",
+            count > 0 ? "bg-[#E58A7B] text-black" : "bg-white text-black",
+          ].join(" ")}
+          aria-label={`hits ${count}`}
+        >
+          {count}
+        </div>
+      </div>
     </Link>
   );
 }
