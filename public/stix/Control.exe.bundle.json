@@ -1,0 +1,114 @@
+{
+  "type": "bundle",
+  "id": "bundle--758f9acc-b594-445e-bd32-bb5a7a44bc24",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--c2bea24c-e849-48b4-a896-12d1d45b34fd",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "CVE-2021-40444 via suspicious patterns ",
+      "description": "Detects potential exploitation of CVE-2021-40444 via suspicious process patterns seen in in-the-wild exploitations",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable : \\(\\*control\\.exe\\) and process\\.parent\\.executable : \\(\\*winword\\.exe or \\*powerpnt\\.exe or \\*excel\\.exe\\) and not \\(process\\.command_line : \\(\\*control\\.exe input\\.dll\\)\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "control.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules-emerging-threats/2021/Exploits/CVE-2021-40444/proc_creation_win_exploit_cve_2021_40444.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--dfb2711e-a0bf-4362-b3f1-6958de7b14f9",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Suspicious Rundll32 from control.exe ",
+      "description": "Detects suspicious Rundll32 execution from control.exe as used by Equation Group and Exploit Kits",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.parent\\.executable : \\(\"\\*System32\\\\control\\.exe\"\\) and \\(process\\.name: \\(RUNDL32\\.EXE or rundll32\\.exe\\) or process\\.executable : \\(\\*RUNDL32\\.EXE or \\*rundll32\\.exe\\)\\) and not process\\.executable: \\(\\*Shell32\\.dll\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "control.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_rundll32_susp_control_dll_load.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--185ee628-a6fb-4e4a-8fb2-f160799c50a0",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Unusual instances of Control Panel with suspicious keywords or paths in the process command line",
+      "description": "Identifies unusual instances of Control Panel with suspicious keywords or paths in the process command line value. Adversaries may abuse Control.exe to proxy execution of malicious code.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable : \\(\"\\?:\\\\\\\\Windows\\\\\\\\SysWOW64\\\\\\\\control\\.exe\" or \"\\?:\\\\\\\\Windows\\\\\\\\System32\\\\\\\\control\\.exe\"\\) and event\\.type : \\(start or process_started\\) and process\\.command_line :\\(\"\\*\\.jpg\\*\" or \"\\*\\.png\\*\" or \"\\*\\.gif\\*\" or \"\\*\\.bmp\\*\" or \"\\*\\.jpeg\\*\" or \"\\*\\.TIFF\\*\" or \"\\*\\.inf\\*\" or \"\\*\\.dat\\*\" or \"\\*\\.cpl:\\*/\\*\" or \"\\*\\.\\./\\.\\./\\.\\.\\*\" or \"\\*/AppData/Local/\\*\" or \"\\*:\\\\\\\\Users\\\\\\\\Public\\\\\\\\\\*\" or \"\\*\\\\\\\\AppData\\\\\\\\Local\\\\\\\\\\*\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "control.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/0875c1e4c4370ab9fbf453c8160bb5abc8ad95e7/rules/windows/defense_evasion_execution_control_panel_suspicious_args.toml  "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--d18217a4-e856-4a14-beda-e78ab5a13068",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Processes runnig from Alternate Data Streams",
+      "description": "Identifies processes running from an Alternate Data Stream. This is uncommon for legitimate processes and sometimes done by adversaries to hide malware.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.type : \\(start\\) and process\\.args: \\(\"\\?:\\\\\\\\\\*:\\*\"\\) and process\\.args_count : 1.*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "control.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/61afb1c1c0c3f50637b1bb194f3e6fb09f476e50/rules/windows/defense_evasion_unusual_dir_ads.toml"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "type": "bundle",
+  "id": "bundle--0aeac701-204c-4b0a-baee-9a8c7d61ea33",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--4a26ed77-d145-443d-af1f-96dcd23ca6de",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Load of dll or ocx files from suspicious locations",
+      "description": "Detects cmstp loading \"dll\" or \"ocx\" files from suspicious locations",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable : \"\\*cmstp\\.exe\" and process\\.command_line : \\(\"\\*\\.dll\" or \"\\*\\.ocx\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmdl32.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/image_load/image_load_cmstp_load_dll_from_susp_location.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--a19e66a0-e746-4a61-a48d-4227da7f3988",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Command line usage to install specially formatted local .inf files",
+      "description": "Detect commandline usage of Microsoft Connection Manager Profile Installer (cmstp.exe) to install specially formatted local .INF files",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\(cmstp\\.exe or CMSTP\\.EXE\\)\nor process\\.executable : \\(\"\\*cmstp\\.exe\" or \"\\*CMSTP\\.EXE\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmdl32.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_uac_bypass_cmstp.yml "
+        }
+      ]
+    }
+  ]
+}

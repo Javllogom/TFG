@@ -1,0 +1,33 @@
+{
+  "type": "bundle",
+  "id": "bundle--103178c4-a09d-48b9-aace-34bf1fae50fb",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--1830c558-8000-4377-b836-e85a73a34a3b",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Usage of cipher utility to overwrite deleted data from disk",
+      "description": "Detects usage of the \"cipher\" built-in utility in order to overwrite deleted data from disk. Adversaries may destroy data and files on specific systems or in large numbers on a network to interrupt availability to systems, services, and network resources. Data destruction is likely to render stored data irrecoverable by forensic techniques through overwriting files or data on local and remote drives ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\(\\*cipher\\.exe or \\*CIPHER\\.EXE\\) or process\\.executable : \\(\\*cipher\\.exe or \\*CIPHER\\.EXE\\) and process\\.command_line : \\(\\*/w\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cipher.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/c7998c92b3c5f23ea67045bee8ee364d2ed1a775/rules/windows/process_creation/proc_creation_win_cipher_overwrite_deleted_data.yml "
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "type": "bundle",
+  "id": "bundle--e2633eea-70b5-48f9-91a5-3a74c465182a",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--75e2e479-832a-4a3c-9ae7-158a06fdf4c8",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Detection and usage of AppInstaller.exe",
+      "description": "AppInstaller.exe is spawned by the default handler for the \"ms-appinstaller\" URI. It attempts to load/install a package from the referenced URL",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable : \\(\\*Program Files\\* and \\*WindowsApps\\* and \\*Microsoft\\.DesktopAppInstaller_\\* and \\*AppInstaller\\.exe\\)\r\n.*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "appinstaller.exe "
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/dns_query/dns_query_win_lolbin_appinstaller.yml  "
+        }
+      ]
+    }
+  ]
+}

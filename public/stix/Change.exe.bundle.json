@@ -1,0 +1,33 @@
+{
+  "type": "bundle",
+  "id": "bundle--e7d63e9f-fcd5-4d22-aefb-7d99f5a18c84",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--01cc547e-2185-4222-b22b-c3c7744d7472",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "IOC Execution of child process outside of its normal path",
+      "description": "Change.exe being executed and executes a child process outside of its normal path of c:\\windows\\system32\\ or c:\\windows\\syswow64\\",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.parent\\.name: \\(\\*change\\.exe or \\*Change\\.exe\\) and not process\\.executable: \\(\\(\\*Windows\\* or \\*windows\\* and \\*system32\\*\\) or \\(\\*windows\\* or \\*Windows\\* and \\*syswow64\\*\\)\\) .*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "change.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://lolbas-project.github.io/lolbas/Binaries/Change/ "
+        }
+      ]
+    }
+  ]
+}

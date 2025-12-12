@@ -42,6 +42,65 @@ export default function RuleSettings({
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // --- drag & drop reordering for columns ---
+
+    // --- drag & drop reordering for columns ---
+
+    // Which item is being dragged right now
+    const [dragIdx, setDragIdx] = useState<number | null>(null);
+
+    // Allow drag only when the handle is pressed (not when user drags the select)
+    const allowDragRef = useRef(false);
+
+    // Called from the hamburger button (mousedown) to allow starting a drag
+    function allowDragFromHandle() {
+        allowDragRef.current = true;
+    }
+
+    // Start dragging
+    function onDragStart(idx: number, e: React.DragEvent<HTMLDivElement>) {
+        if (!allowDragRef.current) {
+            // Ignore drags that did not start on the handle
+            e.preventDefault();
+            return;
+        }
+        allowDragRef.current = false; // consume permission from handle
+        setDragIdx(idx);
+
+        if (e.dataTransfer) {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', String(idx)); // not really used, but standard
+            // Do NOT set a custom dragImage -> browser will use a snapshot of the row (visual ghost)
+        }
+    }
+
+    // While dragging over another item: live-reorder list
+    function onDragOver(idx: number, e: React.DragEvent<HTMLDivElement>) {
+        if (dragIdx === null || dragIdx === idx) return;
+        e.preventDefault(); // required to allow drop and for smooth DnD
+
+        setColumns(prev => {
+            const next = [...prev];
+            const [moved] = next.splice(dragIdx, 1);
+            next.splice(idx, 0, moved);
+            return next;
+        });
+
+        // The dragged item is now at this new index
+        setDragIdx(idx);
+    }
+
+    // We already reordered in onDragOver, so onDrop only clears state
+    function onDrop(e: React.DragEvent<HTMLDivElement>) {
+        e.preventDefault();
+        setDragIdx(null);
+    }
+
+    function onDragEnd() {
+        setDragIdx(null);
+    }
+
+
 
     // Conjunto de columnas ya elegidas EN ESTE PANEL (estado local, no guardado)
     const takenSet = useMemo(() => {
@@ -109,41 +168,44 @@ export default function RuleSettings({
     }
 
     async function handleSave() {
-        try {
-            setSaving(true);
-            setError(null);
+  try {
+    setSaving(true);
+    setError(null);
 
-            // sanitize payload
-            const payload = {
-                title: title.trim(),
-                rule: rule.trim(),                 // ✅
-                description: (description ?? '').trim(), // ✅
-                columns: columns.map(c => c.trim()).filter(Boolean),
-            };
+    // Build payload with the current in-drawer state
+    const payload = {
+      title: title.trim(),
+      rule: rule.trim(),
+      description: (description ?? '').trim(),
+      // 👇 this preserves the visual order of the columns
+      columns: columns.map((c) => c.trim()).filter(Boolean),
+    };
 
+    // Call server action to persist in Supabase
+    const updated = await updateRuleInDb(payload, {
+      id: initial.id ?? undefined,
+      matchBinary: initial.matchBinary,
+      matchTitle: initial.matchTitle,
+    });
 
-            // Call server action (uses supabaseServer on the server)
-            const updated = await updateRuleInDb(payload, {
-                id: initial.id ?? undefined,
-                matchBinary: initial.matchBinary, // exact DB value (untrimmed)
-                matchTitle: initial.matchTitle,   // exact DB value (untrimmed)
-            });
-
-            if (!updated) {
-                throw new Error('No rows were updated (check matchBinary/matchTitle).');
-            }
-
-            onSaved?.({
-                ...initial,
-                ...payload,
-            });
-            onClose();
-        } catch (e: any) {
-            setError(e?.message ?? 'Save failed');
-        } finally {
-            setSaving(false);
-        }
+    if (!updated) {
+      throw new Error('No rows were updated (check matchBinary/matchTitle).');
     }
+
+    // Let parent refresh its own state (including column order)
+    onSaved?.({
+      ...initial,
+      ...payload,
+    });
+
+    onClose();
+  } catch (e: any) {
+    setError(e?.message ?? 'Save failed');
+  } finally {
+    setSaving(false);
+  }
+}
+
 
 
     // Prevent scroll bleed when open
@@ -202,18 +264,18 @@ export default function RuleSettings({
                 <div className="flex-1 overflow-y-auto p-5 space-y-6 pb-28">
                     {/* Title */}
                     <section>
-                        <h3 className="text-[15px] font-semibold mb-2">Title</h3>
+                        <h3 className="text-[15px] font-semibold mb-2">Título</h3>
                         <input
                             className="w-full rounded-xl px-4 py-3 text-emerald-950 bg-[#F5F4CB] outline-none placeholder:text-emerald-900/50 shadow-sm"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Rule title"
+                            placeholder="Título de la regla"
                         />
                     </section>
 
                     {/* Rule */}
                     <section>
-                        <h3 className="text-[15px] font-semibold mb-2">Rule</h3>
+                        <h3 className="text-[15px] font-semibold mb-2">Regla</h3>
                         <textarea
                             className="w-full rounded-xl px-4 py-3 text-emerald-950 bg-[#F5F4CB] outline-none min-h-[120px] resize-vertical shadow-sm"
                             value={rule}
@@ -224,28 +286,59 @@ export default function RuleSettings({
 
                     {/* Description */}
                     <section>
-                        <h3 className="text-[15px] font-semibold mb-2">Description</h3>
+                        <h3 className="text-[15px] font-semibold mb-2">Descripción</h3>
                         <textarea
                             className="w-full rounded-xl px-4 py-3 text-emerald-950 bg-[#F5F4CB] outline-none min-h-[90px] resize-vertical shadow-sm"
                             value={description ?? ''}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Explain what this rule detects"
+                            placeholder="Explica qué detecta esta regla y por qué es importante."
                         />
                     </section>
 
                     {/* Columns */}
                     <section>
-                        <h3 className="text-[15px] font-semibold mb-2">Columns</h3>
+                        <h3 className="text-[15px] font-semibold mb-2">Columnas</h3>
 
                         <div className="space-y-3">
                             {columns.map((col, idx) => (
-                                <div key={idx} className="flex items-center gap-2">
+                                <div
+                                    key={idx}
+                                    draggable
+                                    onDragStart={(e) => onDragStart(idx, e)}
+                                    onDragOver={(e) => onDragOver(idx, e)}
+                                    onDrop={onDrop}
+                                    onDragEnd={onDragEnd}
+                                    className={[
+                                        "flex items-center gap-2",
+                                        "transform transition-transform transition-shadow transition-colors duration-150 ease-out",
+                                        dragIdx === idx
+                                            ? "ring-2 ring-emerald-400/70 rounded-xl opacity-80 scale-[0.98] shadow-lg"
+                                            : "",
+                                    ].join(" ")}
+                                >
+
+                                    {/* drag handle (hamburger) */}
+                                    <button
+                                        type="button"
+                                        onMouseDown={allowDragFromHandle}        // only start drag from here
+                                        className="w-8 h-8 shrink-0 grid place-items-center text-emerald-900/90 bg-[#F5F4CB] rounded-lg cursor-grab active:cursor-grabbing"
+                                        title="Arrastrar para reordenar"
+                                        aria-label="Arrastrar para reordenar"
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+                                            <path d="M5 8h14M5 12h14M5 16h14" stroke="#135B0A" strokeWidth="2" strokeLinecap="round" />
+                                        </svg>
+                                    </button>
+
+
+                                    {/* yellow chip with the select inside */}
                                     <div className="flex-1 bg-[#F5F4CB] rounded-xl px-3 py-2 shadow-sm">
                                         <select
-                                            className="w-full bg-transparent text-emerald-950 outline-none pr-6 cursor-pointer" // show hand cursor
+                                            className="w-full bg-transparent text-emerald-950 outline-none pr-6 cursor-pointer"
                                             value={columns[idx] ?? ""}
                                             onChange={(e) => setColumn(idx, e.target.value)}
                                         >
+                                            {/* keep current value visible even if not in the valid options */}
                                             {(!optionsForIndex(idx).includes(columns[idx])) && columns[idx] && (
                                                 <option value={columns[idx]}>{columns[idx]}</option>
                                             )}
@@ -255,16 +348,17 @@ export default function RuleSettings({
                                         </select>
                                     </div>
 
-
+                                    {/* remove button (–) */}
                                     <button
                                         onClick={() => removeColumn(idx)}
-                                        className="rounded-full w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 active:bg-white/30 cursor-pointer" // hand cursor
-                                        title="Remove column"
-                                        aria-label="Remove column"
+                                        className="rounded-full w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 active:bg-white/30 cursor-pointer"
+                                        title="Eliminar columna"
+                                        aria-label="Eliminar columna"
                                     >
                                         –
                                     </button>
                                 </div>
+
 
 
 
@@ -277,8 +371,8 @@ export default function RuleSettings({
                                     onClick={addColumn}
                                     disabled={!firstUnusedOption()}   // 🔒 desactivado si no quedan opciones
                                     className="rounded-full w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 active:bg-white/30 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed" // hand cursor (blocked when disabled)
-                                    title="Add column"
-                                    aria-label="Add column"
+                                    title="Agregar columna"
+                                    aria-label="Agregar columna"
                                 >
                                     +
                                 </button>
@@ -297,13 +391,13 @@ export default function RuleSettings({
                         onClick={onClose}
                         className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 cursor-pointer" // hand cursor
                     >
-                        Cancel
+                        Cancelar
                     </button>
                     <button
                         onClick={handleSave}
                         disabled={saving}
                         className="px-4 py-2 rounded-lg bg-[#F5F4CB] text-emerald-950 font-semibold cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"                    >
-                        {saving ? 'Saving…' : 'Save'}
+                        {saving ? 'Guardando…' : 'Guardar'}
                     </button>
                 </div>
 

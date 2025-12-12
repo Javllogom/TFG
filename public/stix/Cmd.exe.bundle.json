@@ -1,0 +1,1140 @@
+{
+  "type": "bundle",
+  "id": "bundle--8d71518a-b035-4e97-9079-ab2682b735fb",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--8ae04aae-dc04-4b2f-b077-310aa7af02f6",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Mount of a WebDAV server and inmediate execution of content",
+      "description": "Detects the execution of the \"net use\" command to mount a WebDAV server and then immediately execute some content in it. As seen being used in malicious LNK files",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\*cmd\\.exe and process\\.command_line : \\(\"\\* net use http\\*\" and \"\\*& start /b\\*\" and \"\\*\\\\DavWWWRoot\\\\\\*\"\\) and process\\.command_line :\\(\\.exe or \\.dll or \\.bat or \\.vbs or \\.ps1\\) .*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_net_use_and_exec_combo.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--d7dcd37b-4a5f-4af9-8706-1e3fa96db8b2",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Download of payload to evade antivirus",
+      "description": "Lolbas Cmdl32 is use to download a payload to evade antivirus ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.* process\\.name: \\(cmdl32\\.exe or CMDL32\\.EXE\\) and process\\.command_line : \\(\"//vpn\" or \"//lan\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_lolbin_cmdl32.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--ccb8ab7f-1d39-4624-baa2-3a46962af0e1",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Xp_cmdshell settings change",
+      "description": "Detects when the MSSQL \"xp_cmdshell\" stored procedure setting is changed",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*winlog\\.provider_name : MSQLSERVER and event\\.code : 15457 and event\\.original : \\*xp_cmdshell\\*.*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/builtin/application/mssqlserver/win_mssql_xp_cmdshell_change.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--520c2b50-368f-4884-a47e-843c39ad1d0b",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Network connections ran with no command line parameters ",
+      "description": "Detects suspicious network connections made by a well-known Windows binary run with no command line parameters",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\(\\*regsvr32\\.exe or \\*rundll32\\.exe or \\*dllhost\\.exe\\) and process\\.command_line : \\(\\*regsvr32\\.exe or \\*rundll32\\.exe or \\*dllhost\\.exe\\) and not \\(process\\.command_line : \\(\"\" or \"null\"\\) \\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/network_connection/net_connection_win_susp_binary_no_cmdline.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--b3e32d0a-a57c-48fe-825f-56a19d91c0e3",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Usage of \">\" to redirect information in command line",
+      "description": "Detects the use of the redirection character \">\" to redicrect information in commandline ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name : cmd\\.exe and process\\.command_line : \"\\*>\\*\" and not process\\.command_line : \\(\\(\"\\*Program Files \\(x86\\)\\*\" and \"\\*Internet Download Manager\\*\" and \"\\*IDMMsgHost\\.exe\\*\"\\) or \\(\"\\*chrome-extension\\*\"\\) or \\(\\*pipe\\* and \"\\*chrome\\.nativeMessaging\\*\"\\)\\) .*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_redirect.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--9d8e99d3-9912-43a5-b19d-f7916d417579",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Usage of cmd key to look for cached credentials",
+      "description": "Detects usage of cmdkey to look for cached credentials on the system",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: cmdkey\\.exe and process\\.command_line : \\(\"\\*/l\\*\" or \"\\*-l\\*\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmdkey_recon.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--8c89faa2-14ee-47d3-a13d-9ba2fbb9ef30",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Processes running from ADS",
+      "description": "Identifies processes running from an Alternate Data Stream. This is uncommon for legitimate processes and sometimes done by adversaries to hide malware.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.type: start and process\\.args : \\(\"\\?:\\\\\\\\\\*:\\*\"\\) and process\\.args_count: 1.*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/61afb1c1c0c3f50637b1bb194f3e6fb09f476e50/rules/windows/defense_evasion_unusual_dir_ads.toml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--24572471-2e21-4910-8af7-1a21efe54b91",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Suspicious command line containing an URL and AppData string",
+      "description": "Detects a suspicious command line execution that includes an URL and AppData string in the command line parameters as used by several droppers (js/vbs > powershell)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.command_line : \\(\"\\*\\^\\^\\*\" or \"\\*\\^\\|\\^\\*\" or \"\\*,;,\\*\" or \"\\*;;;;\\*\" or \"\\*;; ;;\\*\" or \"\\*\\(,\\(,\\)\\)\\*\" or \"\\*%COMSPEC:~\\*\" or \"\\*c\\^m\\^d\\*\" or \"\\*\\^c\\^m\\^d\\*\" or \"\\*c\\^md\\*\" or \"\\*cm\\^d\\*\" or \"\\*cm\\^d\\*\" or \"\\*\\^cm\\^d\\*\" or \"\\*s\\^et\\*\" or \"\\*s\\^e\\^t\\*\" or \"\\*se\\^t\\*\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_http_appdata.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--8777f279-1bdb-4002-b890-36e272459c66",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Xp_cmdshell used to execute commands",
+      "description": "Detects when the MSSQL \"xp_cmdshell\" stored procedure is used to execute commands ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.original : \\(\"\\*object_name:xp_cmdshel\\*\" and \"\\*statement:EXEC\\*\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/builtin/application/mssqlserver/win_mssql_xp_cmdshell_audit_log.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--375840c3-c93a-4084-b79c-f3351e773497",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Usage of cs.exe to create, modify or start services on remote hosts",
+      "description": "Identifies use of sc.exe to create, modify, or start services on remote hosts. This could be indicative of adversary lateral movement but will be noisy if commonly done by admins.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*\\(event\\.category : process and event\\.type : \\(start or process_started\\) and \\(process\\.name : sc\\.exe or process\\.pe\\.original_file_name : sc\\.exe\\) and process\\.args : \"\\\\\\\\\\\\\\\\\\*\" and process\\.args : \\(\"binPath=\\*\" or \"binpath=\\*\"\\) and process\\.args : \\(create or config or failure or start\\)\\) or \\(event\\.category: network and process\\.name : sc\\.exe and not destination\\.ip : 127\\.0\\.0\\.1\\) .*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/414d32027632a49fb239abb8fbbb55d3fa8dd861/rules/windows/lateral_movement_cmd_service.toml#L38 "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--1beea34e-67d2-46bb-a2fa-53a54cde5cc4",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Payload obfuscation ",
+      "description": "Detects possible payload obfuscation via the command line",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.command_line : \\(\"\\*\\^\\^\\*\" or \"\\*\\^\\|\\^\\*\" or \"\\*,;,\\*\" or \"\\*;;;;\\*\" or \"\\*;; ;;\\*\" or \"\\*\\(,\\(,\\)\\)\\*\" or \"\\*%COMSPEC:~\\*\" or \"\\*c\\^m\\^d\\*\" or \"\\*\\^c\\^m\\^d\\*\" or \"\\*c\\^md\\*\" or \"\\*cm\\^d\\*\" or \"\\*cm\\^d\\*\" or \"\\*\\^cm\\^d\\*\" or \"\\*s\\^et\\*\" or \"\\*s\\^e\\^t\\*\" or \"\\*se\\^t\\*\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_dosfuscation.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--3cf5d9ed-250b-4eb8-8f17-4afa473cef0a",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Usage to add generic credentials",
+      "description": "Detects usage of cmdkey to add generic credentials. As an example, this has to be used before connecting to an RDP session via command line interface. ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\*cmdkey\\.exe and process\\.command_line : \\(\"\\*/g\\*\" and \"\\*/u\\*\" and \"\\*/p\\*\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmdkey_adding_generic_creds.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--2e6fc336-2670-42fc-9856-ab6906351941",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "\"curl\" comand to download payloads remotely",
+      "description": "Adversaries can use curl to download payloads remotely and execute them. Curl is included by default in Windows 10 build 17063 and later.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.command_line : \\(\"\\* /c\\*\" and \\*curl\\* and \\*http\\* and \"\\*-o\\*\" and &\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_curl_download_exec_combo.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--bff614eb-9141-4fda-91b4-12315d479f56",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Usage of \"<\" to read and execute files via cmd.exe",
+      "description": "Detect the use of \"<\" to read and potentially execute a file via cmd.exe",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name : \\*cmd\\.exe and process\\.command_line : \"\\*<\\*\".*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_stdin_redirect.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--9d2c9d4d-eee5-4359-b2f8-4fbb340958b8",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Usage and installation of a backdoor",
+      "description": "Detects the usage and installation of a backdoor that uses an option to register a malicious debugger for built-in tools that are accessible in the login screen",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.parent\\.name \\*winlogon\\.exe and process\\.name : \\(\\*cmd\\.exe or \\*cscript\\.exe or \\*mshta\\.exe or \\*powershell\\.exe or \\*pwsh\\.exe or \\*regsvr32\\.exe or \\*rundll32\\.exe or \\*wscript\\.exe or \\*wt\\.exe\\) and process\\.command_line :\\(\\*sethc\\.exe\\* or \\*utilman\\.exe\\* or \\*osk\\.exe\\* or \\*Magnify\\.exe\\* or \\*Narrator\\.exe\\* or \\*DisplaySwitch\\.exe\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_sticky_key_like_backdoor_execution.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--101d22ab-d937-435e-aec6-4abc0f6bdedf",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Suspicious parent",
+      "description": "Detects suspicious parent process for cmd.exe ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\*cmd\\.exe and process\\.parent\\.name: \\(\\*csrss\\.exe or \\*ctfmon\\.exe or \\*dllhost\\.exe or \\*epad\\.exe or \\*FlashPlayerUpdateService\\.exe or \\*GoogleUpdate\\.exe or \\*jucheck\\.exe or \\*jusched\\.exe or \\*LogonUI\\.exe or \\*lsass\\.exe or \\*regsvr32\\.exe or \\*SearchIndexer\\.exe or \\*SearchProtocolHost\\.exe or \\*SIHClient\\.exe or \\*sihost\\.exe or \\*slui\\.exe or \\*spoolsv\\.exe or \\*sppsvc\\.exe or \\*taskhostw\\.exe or \\*unsecapp\\.exe or \\*WerFault\\.exe or \\*wergmgr\\.exe or \\*wlanext\\.exe or \\*WUDFHost\\.exe\\) .*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_unusual_parent.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--6f2c285f-1c54-47f6-94b3-56eb1d734884",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution of \"rmdir\" command to delete directories. ",
+      "description": "Detects execution of the builtin \"rmdir\" command in order to delete directories. Adversaries may delete files left behind by the actions of their intrusion activity. Malware, tools, or other non-native files dropped or created on a system by an adversary may leave traces to indicate to what was done within a network and how. Removal of these files can occur during an intrusion, or as part of a post-intrusion process to minimize the adversary's footprint.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\*cmd\\.exe and process\\.command_line : \\*rmdir\\* and process\\.command_line : \\(\"\\*/s\\*\" or \"\\*/q\\*\" \\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_rmdir_execution.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--f0c03ae1-d884-4ffc-9030-46ed8089c06f",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Shadow Copy",
+      "description": "Detects the execution of the builtin \"copy\" command that targets a shadow copy (sometimes used to copy registry hives that are in use)",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.command_line : \\(\\*copy \\* and \"\\*\\\\\\\\\\\\\\\\\\\\\\?\\\\\\\\GLOBALROOT\\\\\\\\Device\\\\\\\\HarddiskVolumeShadowCopy\\*\".*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_shadowcopy_access.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--74a7270f-edb9-4ad5-8461-6a0bdc48ad09",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Usage of \"dir\" command",
+      "description": "Detects usage of the \"dir\" command that's part of windows batch/cmd to collect information about directories",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.command_line : \\(\\*dir\\* and \"\\*/s\\*\" and \"\\*/b\\*\" \\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_dir_execution.yml  "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--9c6c36a3-fa9f-4233-bd3c-4b06be6addf9",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Creation of symbolic link between cmd.exe and osk.exe ",
+      "description": "Detects the creation of a symbolic link between \"cmd.exe\" and the accessibility on-screen keyboard binary (osk.exe) using \"mklink\". This technique provides an elevated command prompt to the user from the login screen without the need to log in.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\*cmd\\.exe and process\\.command_line : \\(\\*mslink\\* and \\*osk\\.exe\\* and \\*cmd\\.exe\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_mklink_osk_cmd.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--c21b4507-5adb-4f45-995b-4213b89c0235",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Potential path traversal attempt",
+      "description": "Detects potential path traversal attempt via cmd.exe. Could indicate possible command/argument confusion/hijacking",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\*cmd\\.exe or process\\.parent\\.name: \\*cmd\\.exe and process\\.parent\\.command_line :\\(\"\\*/c\\*\" or \"\\*/k\\*\" or \"\\*/r\\*\"\\) or process\\.command_line : \\(\"\\*/c\\*\" or \"\\*/k\\*\" or \"\\*/r\\*\"\\) and not process\\.command_line :\\(\\*Tasktop\\* and \\*keycloak\\* and \\*bin\\* and \\*jre\\* and \\*java\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_path_traversal.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--5ab6f2c8-2840-4a85-804a-2553cad3c46a",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Usage of the copy command to copy files from a remote share",
+      "description": "Detects usage of the copy builtin cmd command to copy files with the \".dmp\"/\".dump\" extension from a remote share",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\*cmd\\.exe and process\\.command_line : \\(\\(\\*copy\\* and \"\\*\\\\\\\\\\\\\\\\\\*\"\\) or \\(\"\\*\\.dmp\\*\" or \"\\*\\.dump\\*\"\\)\\) .*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_copy_dmp_from_share.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--623637b7-edb2-4716-a870-bb1905ca90e0",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Usage of \"del\" to remove files using wildcards/greedy expressions",
+      "description": "Detects execution of the \"del\" builtin command to remove files using greedy/wildcard expression. This is often used by malware to delete content of folders that perhaps contains the initial malware infection or to delete evidence.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\*cmd\\.exe and process\\.command_line : \\(\\(\\*del\\* or \\*erase\\*\\) and \\(\"\\*\\\\\\\\\\\\\\*\\.dll\\*\" or \"\\*\\\\\\\\\\\\\\*\\.exe\\*\"\\)\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_del_greedy_deletion.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--335baa9c-09a1-44c3-9ecc-14f4b721d477",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Replacement of sticky keys",
+      "description": "By replacing the sticky keys executable with the local admins CMD executable, an attacker is able to access a privileged windows console session without authenticating to the system. When the sticky keys are \"activated\" the privileged shell is launched.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.command_line : \\(\\*copy\\* and \"\\*/y\\*\" and \"\\*C:\\\\windows\\\\system32\\\\cmd\\.exe C:\\\\windows\\\\system32\\\\sethc\\.exe\\*\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_sticky_keys_replace.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--aa779e5c-35ea-4fce-aaeb-bf3c41d85355",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Windows Task Scheduler for initial or recurring execution of malicious code ",
+      "description": "Adversaries may abuse the Windows Task Scheduler to perform task scheduling for initial or recurring execution of malicious code",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.* \\(winlog\\.event_data\\.ScriptBlockText : \\(\\*New-ScheduledTaskAction\\* or \\*New-ScheduledTaskTrigger\\* or \\*New-ScheduledTaskPrincipal\\* or \\*New-ScheduledTaskSettingsSet\\* or \\*New-ScheduledTask\\* or \\*Register-ScheduledTask\\*\\)\\) or \\(winlog\\.event_data\\.ScriptBlockText : \\(\\*Invoke-CimMethod\\* and \\*-ClassName\\* and \\*PS_ScheduledTask\\* and \\*-NameSpace\\* and \"\\*Root\\\\Microsoft\\\\Windows\\\\TaskScheduler\\*\"\\)\\) .*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/powershell/powershell_script/posh_ps_cmdlet_scheduled_task.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--7aa9540d-c7f9-4a7a-9e65-5634668c7bc1",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Python script executed using command line input and sys module",
+      "description": "Identifies when a Python script is executed using command line input and imports the sys module. Attackers often use this method to execute malicious scripts and avoiding writing it to disk.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.category : process and event\\.type: \\(start or process_started\\) and process\\.name python\\* and process\\.args: \"\\*-c\\*\" and process\\.args: \"\\*import\\*sys\\*\".*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/414d32027632a49fb239abb8fbbb55d3fa8dd861/rules/cross-platform/execution_python_script_in_cmdline.toml  "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--98454e99-c050-45a9-b8a2-a59ac65e8b7f",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Reverse shell activity suspicion",
+      "description": "Identifies the execution of a shell process with suspicious arguments which may be indicative of reverse shell activity.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.category: process and event\\.type: \\(start or process_started\\) and process\\.name: \\(sh\\* or bash\\* or zsh\\* or dash\\* or zmodload\\*\\) and process\\.args: \\(\"\\*/dev/tcp/\\*\" or \"\\*/dev/udp/\\*\" or \"zsh/net/tcp\" or \"zsh/net/udp\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/414d32027632a49fb239abb8fbbb55d3fa8dd861/rules/cross-platform/execution_revershell_via_shell_cmd.toml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--10222d07-ed93-45b0-bc7a-267cd256adcf",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution via MSSQL xp_cmdshell stored procedure",
+      "description": "Identifies execution via MSSQL xp_cmdshell stored procedure. Malicious users may attempt to elevate their privileges by using xp_cmdshell, which is disabled by default, thus, it's important to review the context of it's use.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.category: process and event\\.category: \\(start or process_started\\) and process\\.name : \\*cmd\\* and process\\.parent\\.name : sqlservr\\.exe.*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/414d32027632a49fb239abb8fbbb55d3fa8dd861/rules/windows/execution_via_xp_cmdshell_mssql_stored_procedure.toml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--0e633a5d-33b7-4d85-962f-960177a2e9c8",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Collect keychain storage data from a system",
+      "description": "Adversaries may collect keychain storage data from a system to in order to acquire credentials. Keychains are the built-in way for macOS to keep track of users' passwords and credentials for many services and features, including Wi-Fi and website passwords, secure notes, certificates, and Kerberos.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.category: process and event\\.category: \\(start or process_started\\) and process\\.name : \\*security\\* and process\\.args:\\(\"find-generic-password\" or \"find-internet-password\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/414d32027632a49fb239abb8fbbb55d3fa8dd861/rules/macos/credential_access_keychain_pwd_retrieval_security_cmd.toml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--a35216f6-2e5d-4f07-8523-d1ecd4493008",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Ntdll.dll type content to a different file or pipe",
+      "description": "Detects command that type the content of ntdll.dll to a different file or a pipe in order to evade AV / EDR detection. As seen being used in the POC NtdllPipe",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.command_line : \\(\"\\*type %windir%\\\\system32\\\\ntdll\\.dll\\*\" or \"\\*type %systemroot%\\\\system32\\\\ntdll\\.dll\\*\" or \"\\*type c:\\\\windows\\\\system32\\\\ntdll\\.dll\\*\" or \"\\*\\\\\\\\ntdll\\.dll > \\\\\\\\\\\\\\\\\\.\\\\\\\\pipe\\\\\\\\\\*\"\\) .*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_ntdllpipe_redirect.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--524f43b2-b213-434d-b976-685530526ede",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution from Alternate Data Stream (ADS)",
+      "description": "Detects execution from an Alternate Data Stream (ADS). Adversaries may use NTFS file attributes to hide their malicious data in order to evade detection",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.command_line : \"\\*txt:\\*\" and \\(process\\.command_line : \\(\\*type \\* and \"\\* > \\*\"\\) or process\\.command_line : \\(\\*makecab\\* and \\*\\.cab\\*\\) or process\\.command_line :\\(\\*reg \\* and \\* export\\*\\) or process\\.command_line : \\(\\*regedit \\* and \"\\* /E \\*\"\\) or process\\.command_line : \\(\\*esentutl \\* and \"\\* /y \\*\" and \"\\* /d \\*\" and \"\\* /o \\*\" \\)\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_susp_alternate_data_streams.yml  "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--db8890f9-bbad-45c5-a34f-9dc409bdaaf2",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Creation of ADS on highly targeted files",
+      "description": "Identifies suspicious creation of Alternate Data Streams on highly targeted files. This is uncommon for legitimate files and sometimes done by adversaries to hide malware.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.type : creation and process\\.executable : \\(\"C:\\*\" and \"\\*:\\*\"\\) and not process\\.executable : \\(\"C:\\*\" and \"\\*:zone\\.identifier\\*\"\\) and file\\.extension : \\(pdf or dll or png or exe or dat or com or bat or cmd or sys or vbs or ps1 or hta or txt or vbe or js or wsh or docx or doc or xlsx or xls or pptx or pptrtf or gif or jpg or png or bmp or img or iso\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/414d32027632a49fb239abb8fbbb55d3fa8dd861/rules/windows/defense_evasion_unusual_ads_file_creation.toml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--b12af56a-8c36-4b8d-ab72-65540dab8200",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Suspicious cmd execution via WMI on remote host ",
+      "description": "Detects suspicious command execution (cmd) via Windows Management Instrumentation (WMI) on a remote host. This could be indicative of adversary lateral movement.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: cmd\\.exe and process\\.parent\\.name : \\*WmiPrvSE\\.exe and process\\.parent\\.command_line : \"\\*127\\.0\\.0\\.1\\*\" and process\\.command_line : \\(\"2>&1\" or \"1>\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/deprecated/windows/proc_creation_win_susp_cmd_exectution_via_wmi.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--3ff3cf14-915e-4a99-8be4-069a2a1f7a79",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Windows utilities used to dump LSASS or AD database",
+      "description": "Identifies use of sc.exe to create, modify, or start services on remote hosts. This could be indicative of adversary lateral movement but will be noisy if commonly done by admins.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.category: process and event\\.type: \\(\"start\" or \"process_started\"\\) and \\(process\\.pe\\.original_file_name : \"procdump\" and process\\.args : \"-ma\"\\) or \\(process\\.name : \"ProcessDump\\.exe\" and not process\\.parent\\.executable : \"C:\\\\\\\\Program Files\\*\\\\\\\\Cisco Systems\\\\\\\\\\*\\.exe\"\\) or \\(process\\.pe\\.original_file_name : \"WriteMiniDump\\.exe\" and not process\\.parent\\.executable : \"C:\\\\\\\\Program Files\\*\\\\\\\\Steam\\\\\\\\\\*\\.exe\"\\) or \\(process\\.pe\\.original_file_name : \"RUNDLL32\\.EXE\" and \\(process\\.args : \"MiniDump\\*\" or process\\.command_line : \"\\*comsvcs\\.dll\\*#24\\*\"\\)\\) or \\(process\\.pe\\.original_file_name : \"RdrLeakDiag\\.exe\" and process\\.args : \"/fullmemdmp\"\\) or \\(process\\.pe\\.original_file_name : \"SqlDumper\\.exe\" and process\\.args : \"0x01100\\*\"\\) or \\(process\\.pe\\.original_file_name : \"TTTracer\\.exe\" and process\\.args : \"-dumpFull\" and process\\.args : \"-attach\"\\) or \\(process\\.pe\\.original_file_name : \"ntdsutil\\.exe\" and process\\.args : \"create\\*full\\*\"\\) or \\(process\\.pe\\.original_file_name : \"diskshadow\\.exe\" and process\\.args : \"/s\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/414d32027632a49fb239abb8fbbb55d3fa8dd861/rules/windows/credential_access_cmdline_dump_tool.toml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--28539a31-8b4a-42e0-8db3-51a458fd8fa7",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution of \"del/erase\" to delete files",
+      "description": "Detects execution of the builtin \"del\"/\"erase\" commands in order to delete files. Adversaries may delete files left behind by the actions of their intrusion activity. Malware, tools, or other non-native files dropped or created on a system by an adversary may leave traces to indicate to what was done within a network and how. Removal of these files can occur during an intrusion, or as part of a post-intrusion process to minimize the adversary's footprint.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.* process\\.name: \\*cmd\\.exe and process\\.command_line : \\(\\(\\*del\\* or \\*erase\\*\\) and \\(\"\\*//f\\*\" or \"\\*//s\\*\" or \"\\*//q\\*\" \\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_del_execution.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--cf2dab96-b227-4126-8af7-830ab8d1c0ec",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Suspicious SolarWinds child process",
+      "description": "A suspicious SolarWinds child process (Cmd.exe or Powershell.exe) was detected.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.category: process and event\\.type : \\(\"start\" or \"process_started\"\\) and process\\.name: \\(\"cmd\\.exe\" or \"powershell\\.exe\"\\) and process\\.parent\\.name: \\( \"ConfigurationWizard\\*\\.exe\" or \"NetflowDatabaseMaintenance\\*\\.exe\" or \"NetFlowService\\*\\.exe\" or \"SolarWinds\\.Administration\\*\\.exe\" or \"SolarWinds\\.Collector\\.Service\\*\\.exe\" or \"SolarwindsDiagnostics\\*\\.exe\" \\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/414d32027632a49fb239abb8fbbb55d3fa8dd861/rules/windows/execution_apt_solarwinds_backdoor_child_cmd_powershell.toml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--71335da3-bb7e-49d3-82f4-24957123b0d0",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "File association changes using \"assoc\"",
+      "description": "Detects file association changes using the builtin \"assoc\" command. When a file is opened, the default program used to open the file (also called the file association or handler) is checked. File association selections are stored in the Windows Registry and can be edited by users, administrators, or programs that have Registry access or by administrators using the built-in assoc utility. Applications can modify the file association for a given file extension to call an arbitrary program when a file with the given extension is opened.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name: \\*cmd\\.exe and process\\.command_line : \\*assoc\\*.*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_assoc_execution.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--d6e1b91d-f9a5-48ca-b54d-9cc0506cfaa0",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Base64 malicious encoded strings ",
+      "description": "Detects base64 encoded strings used in hidden malicious PowerShell command lines",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name : \\(\\*powershell\\.exe or \\*pwsh\\.exe\\) and process\\.command_line : \\* hidden \\* and process\\.command_line : \\(\\*AGkAdABzAGEAZABtAGkAbgAgAC8AdAByAGEAbgBzAGYAZQByA\\* or \\*aXRzYWRtaW4gL3RyYW5zZmVy\\* or \\*IAaQB0AHMAYQBkAG0AaQBuACAALwB0AHIAYQBuAHMAZgBlAHIA\\* or \\*JpdHNhZG1pbiAvdHJhbnNmZX\\* or \\*YgBpAHQAcwBhAGQAbQBpAG4AIAAvAHQAcgBhAG4AcwBmAGUAcg\\* or \\*Yml0c2FkbWluIC90cmFuc2Zlc\\* or \\*AGMAaAB1AG4AawBfAHMAaQB6AGUA\\* or \\*JABjAGgAdQBuAGsAXwBzAGkAegBlA\\* or \\*JGNodW5rX3Npem\\* or \\*QAYwBoAHUAbgBrAF8AcwBpAHoAZQ\\* or \\*RjaHVua19zaXpl\\* or \\*Y2h1bmtfc2l6Z\\* or \\*AE8ALgBDAG8AbQBwAHIAZQBzAHMAaQBvAG4A\\* or \\*kATwAuAEMAbwBtAHAAcgBlAHMAcwBpAG8Abg\\* or \\*lPLkNvbXByZXNzaW9u\\* or \\*SQBPAC4AQwBvAG0AcAByAGUAcwBzAGkAbwBuA\\* or \\*SU8uQ29tcHJlc3Npb2\\* or \\*Ty5Db21wcmVzc2lvb\\* or \\*AE8ALgBNAGUAbQBvAHIAeQBTAHQAcgBlAGEAbQ\\* or \\*kATwAuAE0AZQBtAG8AcgB5AFMAdAByAGUAYQBtA\\* or \\*lPLk1lbW9yeVN0cmVhb\\* or \\*SQBPAC4ATQBlAG0AbwByAHkAUwB0AHIAZQBhAG0A\\* or \\*SU8uTWVtb3J5U3RyZWFt\\* or \\*Ty5NZW1vcnlTdHJlYW\\* or \\*4ARwBlAHQAQwBoAHUAbgBrA\\* or  \\*5HZXRDaHVua\\* or \\*AEcAZQB0AEMAaAB1AG4Aaw\\* or \\*LgBHAGUAdABDAGgAdQBuAGsA\\* or \\*LkdldENodW5r\\* or \\*R2V0Q2h1bm\\* or \\*AEgAUgBFAEEARABfAEkATgBGAE8ANgA0A\\* or \\*QASABSAEUAQQBEAF8ASQBOAEYATwA2ADQA\\* or \\*RIUkVBRF9JTkZPNj\\* or \\*SFJFQURfSU5GTzY0\\* or \\*VABIAFIARQBBAEQAXwBJAE4ARgBPADYANA\\* or \\*VEhSRUFEX0lORk82N\\* or \\*AHIAZQBhAHQAZQBSAGUAbQBvAHQAZQBUAGgAcgBlAGEAZA\\* or \\*cmVhdGVSZW1vdGVUaHJlYW\\* or \\*MAcgBlAGEAdABlAFIAZQBtAG8AdABlAFQAaAByAGUAYQBkA\\* or \\*NyZWF0ZVJlbW90ZVRocmVhZ\\* or \\*Q3JlYXRlUmVtb3RlVGhyZWFk\\* or \\*QwByAGUAYQB0AGUAUgBlAG0AbwB0AGUAVABoAHIAZQBhAGQA\\* or \\*0AZQBtAG0AbwB2AGUA\\* or \\*1lbW1vdm\\* or \\*AGUAbQBtAG8AdgBlA\\* or \\*bQBlAG0AbQBvAHYAZQ\\* or \\*bWVtbW92Z\\* or \\*ZW1tb3Zl\\* \\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_powershell_hidden_b64_cmd.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--d47e400b-3989-43de-aeb5-448258f59811",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Output redirection using \">\" symbol ",
+      "description": "Detects inline windows shell commands redirecting output via the \">\" symbol to a suspicious location",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name : \\*cmd\\.exe and process\\.command_line : \\(\"\\*> \\\\Users\\\\Public\\\\\\*\" or \"\\*> %APPDATA%\\\\\\*\" or \"\\*> %TEMP%\\\\\\*\" or \"\\*> %TMP%\\\\\\*\" or \"\\*> %USERPROFILE%\\\\\\*\" or \"\\*> C:\\\\Temp\\\\\\*\" or \"\\*> C:\\\\Users\\\\Public\\\\\\*\" or \"\\*> C:\\\\Windows\\\\Temp\\\\\\*\" or \"\\*>\\\\Users\\\\Public\\\\\\*\" or \"\\*>%APPDATA%\\\\\\*\" or \"\\*>%TEMP%\\\\\\*\" or \"\\*>%TMP%\\\\\\*\" or \"\\*>%USERPROFILE%\\\\\\*\" or \"\\*>C:\\\\Temp\\\\\\*\" or \"\\*>C:\\\\Users\\\\Public\\\\\\*\" or \"\\*>C:\\\\Windows\\\\Temp\\\\\\*\"\\) or \\(\\(process\\.command_line : \\(\"\\* >\\*\" or \"\\*´>\\*\"\\)\\) and \\(process\\.command_line : \\(\"\\*C:\\\\Users\\\\\\*\" and \"\\*\\\\AppData\\\\Local\\\\\\*\"\\)\\)\\) .*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_redirection_susp_folder.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--a4091db4-6081-4d2e-8dc7-8a7a8c3e0056",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution of macOS commands to dump account hashes",
+      "description": "Identifies the execution of macOS built-in commands used to dump user account hashes. Adversaries may attempt to dump credentials to obtain account login information in the form of a hash. These hashes can be cracked or leveraged for lateral movement.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.category: process and event\\.type: \\(\"start\" or \"process_started\"\\) and \\(process\\.pe\\.original_file_name : \"procdump\" and process\\.args : \"-ma\"\\) or \\(process\\.name : \"ProcessDump\\.exe\" and not process\\.parent\\.executable : \"C:\\\\\\\\Program Files\\*\\\\\\\\Cisco Systems\\\\\\\\\\*\\.exe\"\\) or \\(process\\.pe\\.original_file_name : \"WriteMiniDump\\.exe\" and not process\\.parent\\.executable : \"C:\\\\\\\\Program Files\\*\\\\\\\\Steam\\\\\\\\\\*\\.exe\"\\) or \\(process\\.pe\\.original_file_name : \"RUNDLL32\\.EXE\" and \\(process\\.args : \"MiniDump\\*\" or process\\.command_line : \"\\*comsvcs\\.dll\\*#24\\*\"\\)\\) or \\(process\\.pe\\.original_file_name : \"RdrLeakDiag\\.exe\" and process\\.args : \"/fullmemdmp\"\\) or \\(process\\.pe\\.original_file_name : \"SqlDumper\\.exe\" and process\\.args : \"0x01100\\*\"\\) or \\(process\\.pe\\.original_file_name : \"TTTracer\\.exe\" and process\\.args : \"-dumpFull\" and process\\.args : \"-attach\"\\) or \\(process\\.pe\\.original_file_name : \"ntdsutil\\.exe\" and process\\.args : \"create\\*full\\*\"\\) or \\(process\\.pe\\.original_file_name : \"diskshadow\\.exe\" and process\\.args : \"/s\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/414d32027632a49fb239abb8fbbb55d3fa8dd861/rules/macos/credential_access_dumping_hashes_bi_cmds.toml  "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--98784e58-2184-4013-ba5d-1acbd99683f2",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Command lines missing spaces, indicator of obfuscation",
+      "description": "Detects Windows command lines that miss a space before or after the /c flag when running a command using the cmd.exe. This could be a sign of obfuscation of a fat finger problem (typo by the developer).",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*\\(process\\.command_line : \\(\"\\*cmd\\.exe/c\\*\" or \"\\*\\\\cmd/c\\*\" or \"\\*cmd/c\\*\" or \"\\*cmd\\.exe/k\\*\" or \"\\*\\\\cmd/k\\*\" or \"\\*cmd/k\\*\" or \"\\*cmd\\.exe/r\\*\" or \"\\*\\\\cmd/r\\*\" or \"\\*cmd/r\\*\"\\)\\) or \\(process\\.command_line : \\(\\*cwhoami\\* or \\*cpowershell\\* or \\*cschtasks\\* or \\*cbitsadmin\\* or \\*ccertutil\\* or \\*kwhoami\\* or \\*kpowershell\\* or \\*kschtasks\\* or \\*kbitsadmin\\* or \\*kcertutil\\*\\)\\) and not \\(\\(process\\.command_line : \\(\"\\*cmd\\.exe /c\\*\" or \"\\*cmd /c\\*\" or \"\\*cmd\\.exe /k\\*\" or \"\\*cmd /k\\*\" or \"\\*cmd\\.exe /r\\*\" or \"\\*cmd /r\\*\"\\)\\) or \\(process\\.command_line:\\(\"\\*AppData\\\\Local\\\\Programs\\\\Microsoft VS Code\\\\resources\\\\app\\\\node_modules\\*\" or \"\\*cmd\\.exe/c\" or \"cmd\\.exe /c\"\\)\\)\\) .*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmd_no_space_execution.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--8879ad91-0c81-4356-9971-b9996c3f2b67",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Copy operation of the AD Domain Database or  Security Account Manager (SAM) files",
+      "description": "Identifies a copy operation of the Active Directory Domain Database (ntds.dit) or Security Account Manager (SAM) files. Those files contain sensitive information including hashed domain and/or local credentials.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*event\\.category: process and event\\.type :\\(\"start\" or \"process_started\"\\) and process\\.pe\\.original_file_name : \\(\"Cmd\\.Exe\" or \"PowerShell\\.EXE\" or \"XCOPY\\.EXE\"\\) and process\\.args : \\(\"\\*copy\\*\" or  \"\\*xcopy\\*\" or \"\\*Copy-Item\\*\" or \"\\*move\\*\" or \"\\*cp\\*\" or \"\\*mv\\*\"\\) and process\\.args : \\(\"\\*\\\\\\\\ntds\\.dit\\*\" or \"\\*\\\\\\\\config\\\\\\\\SAM\\*\" or \"\\*\\\\\\\\\\*\\\\\\\\GLOBALROOT\\\\\\\\Device\\\\\\\\HarddiskVolumeShadowCopy\\*\\\\\\\\\\*\"\\) .*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmd.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/elastic/detection-rules/blob/414d32027632a49fb239abb8fbbb55d3fa8dd861/rules/windows/credential_access_copy_ntds_sam_volshadowcp_cmdline.toml "
+        }
+      ]
+    }
+  ]
+}

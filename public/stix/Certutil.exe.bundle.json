@@ -1,0 +1,330 @@
+{
+  "type": "bundle",
+  "id": "bundle--86b84a9a-cddf-4532-b843-c5c0aa480a84",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--fdbe1284-dbc3-49aa-9593-f26356bb0ae1",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution with certain flags to download files",
+      "description": "Detects the execution of certutil with certain flags that allow the utility to download files. ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable: \\*certutil\\.exe and process\\.command_line: \\*http\\* and \\(process\\.command_line: \\*urlcache\\* or process\\.command_line: \\*verifyctl\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_certutil_download.yml  "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--a16061cb-fe76-462b-b3b0-dc5c111a142e",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution with encode flag to encode file to base64 with a suspicious location",
+      "description": "Detects the execution of certutil with the \"encode\" flag to encode a file to base64 where the files are located in potentially suspicious locations ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable: \\*certutil\\.exe and \\(process\\.command_line: \\*-encode\\* or process\\.command_line:\\*/encode\\*\\) and \\(process\\.command_line: \\*\\\\\\\\AppData\\\\\\\\Roaming\\\\\\\\\\* and process\\.command_line: \\*\\\\\\\\Desktop\\\\\\\\\\* or process\\.command_line: \\*\\\\\\\\Local\\\\\\\\Temp\\\\\\\\\\* or process\\.command_line: \\*\\\\\\\\PerfLogs\\\\\\\\\\* or process\\.command_line: \\*\\\\\\\\Users\\\\\\\\Public\\\\\\\\\\* or process\\.command_line: \\*\\\\\\\\Windows\\\\\\\\Temp\\\\\\\\\\* or process\\.command_line: \\*\\$Recycle\\.Bin\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_certutil_encode_susp_location.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--28ee97ca-c94a-4a2e-979d-fc8995e23090",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "ExportPFX flag which allows to export certificates",
+      "description": "Detects the execution of the certutil with the \"exportPFX\" flag which allows the utility to export certificates. ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable: \\*certutil\\.exe and \\(process\\.command_line:\\*-exportPFX\\* or process\\.command_line:\\*/exportPFX\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_certutil_export_pfx.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--70602a23-cbaf-40d2-9dce-94e35688df16",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Flag detection that allows to download files from direct IPs",
+      "description": "Detects the execution of certutil with certain flags that allow the utility to download files from direct IPs. ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*\\(process\\.name: CertUtil\\.exe\\) and\\(process\\.command_line: \\*urlcache \\* or \\*verifyct1 \\*\\) and\\(process\\.command_line : \\*\\\\://1\\* or\\*\\\\://2\\* or\\*\\\\://3\\* or\\*\\\\://4\\* or\\*\\\\://5\\* or\\*\\\\://6\\* or\\*\\\\://7\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_certutil_download_direct_ip.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--c27b497a-e7d5-4099-9bac-9e0f608f6b5a",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Possible NTLM coercionusing the syncwithWU flag",
+      "description": "Detects possible NTLM coercion via certutil using the 'syncwithWU' flag ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable: \\*certutil\\.exe and \\(process\\.command_line:\\* -syncwithWU and process\\.command_line:\\*\\*\\\\\\\\\\\\\\\\\\*\\) and not \\(process\\.command_line: \\*win-rfe-test\\.copyright\\.com\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_certutil_ntlm_coercion.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--fd4b98f1-aecf-418b-aac4-7e7cbfb271c1",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution of certutil with decode or decodehex flags",
+      "description": "Detects the execution of certutil with either the \"decode\" or \"decodehex\" flags to decode base64 or hex encoded files. This can be abused by attackers to decode an encoded payload before execution ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable:\\*certutil\\.exe and \\(process\\.command_line: \\*-decode\\* or process\\.command_line:\\*/decode\\* or process\\.command_line:\\*-decodehex\\* or process\\.command_line:\\*/decodehex\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_certutil_decode.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--30011278-0d83-4d04-a721-4bf97cb9cadf",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution with addstore flag to install a new certificate on the system",
+      "description": "Detects execution of \"certutil\" with the \"addstore\" flag in order to install a new certificate on the system. Adversaries may install a root certificate on a compromised system to avoid warnings when connecting to adversary controlled web servers. ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable: \\*certutil\\.exe and \\(process\\.command_line:\\*/addstore\\* or process\\.command_line:\\*-addstore\\*\\) and process\\.command_line:\\*root\\*.*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_certutil_certificate_installation.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--71f53135-af5a-487f-b0d0-258bcdefd16d",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution with encode flag to encode file to base64 with a suspicious extension",
+      "description": "Detects the execution of certutil with the \"encode\" flag to encode a file to base64 where the extensions of the file is suspicious ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable: \\*certutil\\.exe and \\(process\\.commmand_line: \\*-encode\\* or process\\.command_line: \\*/encode\\*\\) and \\(process\\.command_line: \\*\\.acl\\* or process\\.command_line:\\*\\.bat\\* or process\\.command_line: process\\.command_line: \\*\\.gif\\* or \\*\\.doc\\* or process\\.command_line:\\*\\.jpeg\\* or process\\.command_line:\\*\\.jpg\\* or process\\.command_line: \\*\\.mp3\\* or process\\.command_line: \\*\\.pdf\\* or process\\.command_line:\\*\\.png\\* or process\\.command_line:\\*\\.ppt\\* or process\\.command_line: \\*\\.tmp\\* or process\\.command_line: \\*\\.xls\\* or process\\.command_line: \\*\\.xml\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_certutil_encode_susp_extensions.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--1d8db23f-65bc-4b5c-ac3a-ea45a448cf53",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution with flags that allow it to download files from websites",
+      "description": "Detects the execution of certutil with certain flags that allow the utility to download files from file-sharing websites. ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable: \\*\\\\\\\\certutil\\.exe and \\(process\\.command_line: \\*urlcache \\* or process\\.command_line: \\*verifyctl \\*\\) and \\(process\\.command_line: \\*\\.ghostbin\\.co/\\* or process\\.command_line:\\*\\.hastebin\\.com\\* or process\\.command_line:\\*\\.paste\\.ee\\* or process\\.command_line:\\*anonfiles\\.com\\* or process\\.command_line:\\*cdn\\.discordapp\\.com/attach or process\\.command_line: \\*ddns\\.net\\* or process\\.command_line: \\*gist\\.githubusercontent\\.cc or process\\.command_line: \\*mediafire\\.com\\* or process\\.command_line: \\*mega\\.nz\\* or process\\.command_line:\\*paste\\.ee\\* or process\\.command_line: \\*pastebin\\.com\\* or process\\.command_line: \\*pastebin\\.pl\\* or process\\.command_line:\\*pastetext\\.net\\* or process\\.command_line: \\*privatlab\\.com\\* or process\\.command_line: \\*privatlab\\.net\\* or process\\.command_line:\\*raw\\.githubusercontent\\.com or process\\.command_line:\\*send\\.exploit\\.in\\* or process\\.command_line:\\*sendspace\\.com\\* or process\\.command_line:\\*storage\\.googleapis\\.com\\* or process\\.command_line: \\*transfer\\.sh\\* or process\\.command_line:\\*ufile\\.io\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_certutil_download_file_sharing_domains.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--9be84562-5241-472e-8a48-72f97ee234ce",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution with suspicious subcommands",
+      "description": "Detects a suspicious Microsoft certutil execution with sub commands like 'decode' sub command, which is sometimes used to decode malicious code ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable: \\*certutil\\.exe and  \\(process\\.command_line:\\* -decode \\* or process\\.command_line:\\* -decodehex \\* or process\\.command_line:\\* -urlcache \\* or process\\.command_line:\\* -verifyctl \\* or process\\.command_line:\\* -encode \\* or process\\.command_line:\\* -exportPFX \\* or process\\.command_line:\\* /decode \\* or process\\.command_line:\\* /decodehex \\* or process\\.command_line:\\* /urlcache \\* or process\\.command_line:\\* /verifyctl \\* or process\\.command_line:\\* /encode \\* or process\\.command_line:\\* /exportPFX \\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://copyrightclearancecenter-my.sharepoint.com/personal/jjgomez_copyright_com/_layouts/15/Doc.aspx?sourcedoc={f953deb5-0763-4424-8c38-15ea42ca1bab}&action=edit&wd=target%28Threat%20Hunting.one%7C8ab00bb7-7fc5-43b3-ba90-954272bd8e0d%2FCertutil.exe%20-%20Nick%7C09579234-679f-43c9-9237-afd80a152d96%2F%29&wdorigin=NavigationUrl"
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--558ad739-1c8c-4895-adcc-d5be6ca3305f",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Network connection initiated by certutil",
+      "description": "Detects a network connection initiated by the certutil.exe tool. Attackers can abuse the utility in order to download malware or additional payloads. ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable : \\*\\\\\\\\certutil\\.exe\\* and destination\\.port: \\(80 or 135 or 443 or 445\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/network_connection/net_connection_win_certutil_initiated_connection.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--29279263-b075-4d34-9d9c-f07737372270",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Execution of certutil with decode to encode file to base64",
+      "description": "Detects the execution of certutil with the \"encode\" flag to encode a file to base64. This can be abused by threat actors and attackers for data exfiltration ",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.executable: \\*certutil\\.exe and \\(process\\.command_line: \\*-encode\\* or \\*//encode\\*\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certutil.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_certutil_encode.yml "
+        }
+      ]
+    }
+  ]
+}

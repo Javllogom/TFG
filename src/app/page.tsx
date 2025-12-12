@@ -3,6 +3,9 @@ export const runtime = 'nodejs';
 import BinCard from "@/components/BinCard";
 import ChartWeekly from "@/components/ChartWeekly";
 import { supabaseServer } from "@/lib/supabase";
+import { buildPredicate } from "@/lib/ruleEngine";
+import HomeStixFooter from "./HomeStixFooter";
+
 
 /* ===== Tipos ===== */
 type RuleRow = {
@@ -13,92 +16,8 @@ type RuleRow = {
   link: string;
   columns: string[];          // en Supabase definimos text[]
 };
-type TrafficRow = {
-  ts: string;
-  user_name: string;
-  host_name: string;
-  process_executable: string;
-  process_command_line: string;
-  process_parent_name: string;
-};
 
-/* ===== Helpers parser (motor unificado) ===== */
-function normalizeQuotes(expr: string): string {
-  return expr.replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, " ").trim();
-}
-
-// Acceso a campos + alias snake_case como en el detalle
-const SNAKE_MAP: Record<string, string> = {
-  "user.name": "user_name",
-  "host.name": "host_name",
-  "process.name": "process_name",
-  "process.executable": "process_executable",
-  "process.command_line": "process_command_line",
-  "process.parent.name": "process_parent_name",
-  "event.type": "event_type",
-  "event.action": "event_type", // alias
-  "timestamp": "ts",
-};
-function getField(row: Record<string, any>, path: string): string {
-  const dot = path.split(".").reduce<any>((a, k) => (a != null ? a[k] : undefined), row);
-  if (dot != null) return String(dot);
-  const snake = SNAKE_MAP[path] ?? path.replace(/\./g, "_");
-  return String(row[snake] ?? "");
-}
-
-function wcMatch(value: string, pattern: string): boolean {
-  value = String(value ?? "").replace(/^"+|"+$/g, "").trim();
-  pattern = String(pattern ?? "").trim();
-  const esc = pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");
-  const re = new RegExp(`^${esc}$`, "i");
-  return re.test(value);
-}
-
-// Reescribe campo: ("a" or 'b') y campo: 'lit' / "lit"
-function rewriteFieldComparisons(expr: string): string {
-  expr = normalizeQuotes(expr);
-  const RX = /([a-zA-Z0-9_.]+)\s*:\s*(\((?:[^()]+|\([^()]*\))*\)|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g;
-  return expr.replace(RX, (_m, field, rhs) => {
-    const fld = String(field).trim();
-    if (rhs.startsWith("(")) {
-      const inside = rhs.slice(1, -1);
-      const parts = inside.split(/\s+(and|or)\s+/i);
-      let out = "";
-      for (let i = 0; i < parts.length; i++) {
-        const t = parts[i];
-        if (/^(and|or)$/i.test(t)) out += t.toLowerCase() === "and" ? " && " : " || ";
-        else {
-          const lit = t.trim().replace(/^['"]|['"]$/g, "");
-          out += `__wc(__get(row,"${fld}"), ${JSON.stringify(lit)})`;
-        }
-      }
-      return `(${out})`;
-    } else {
-      const lit = rhs.trim().replace(/^['"]|['"]$/g, "");
-      return `__wc(__get(row,"${fld}"), ${JSON.stringify(lit)})`;
-    }
-  });
-}
-function rewriteLogicalOps(expr: string): string {
-  return expr.replace(/\bnot\b/gi, "!").replace(/\band\b/gi, "&&").replace(/\bor\b/gi, "||");
-}
-function buildPredicate(raw: string | undefined) {
-  const text = normalizeQuotes(String(raw ?? ""));
-  const step1 = rewriteFieldComparisons(text);
-  const step2 = rewriteLogicalOps(step1);
-  // eslint-disable-next-line no-new-func
-  // === REEMPLAZA DESDE AQUÍ (la línea que te falla) ===
-  const fn = new Function(
-    "row",
-    "__wc",
-    "__get",
-    `try { return !!(${step2}); } catch(e){ return false; }`
-  ) as unknown as (row: Record<string, any>, __wc: typeof wcMatch, __get: typeof getField) => boolean;
-
-  return (row: Record<string, any>) => fn(row, wcMatch, getField);
-  // === HASTA AQUÍ ===
-
-}
+type TrafficRow = Record<string, unknown>;
 
 
 /* ===== Datos desde Supabase ===== */
@@ -111,34 +30,38 @@ async function fetchRules(): Promise<RuleRow[]> {
   if (error) throw error;
   return (data ?? []) as RuleRow[];
 }
+
 async function fetchTrafficMinimal(): Promise<TrafficRow[]> {
   const supabase = supabaseServer();
 
   const { data, error } = await supabase
     .from("traffic")
     .select(`
-    timestamp,
-    user_name:"user.name",
-    host_name:"host.name",
-    process_name:"process.name",                    
-    process_executable:"process.executable",
-    process_command_line:"process.command_line",
-    process_parent_name:"process.parent.name"
-  `);
+      timestamp,
+      event_id:"event.id",
+      host_name:"host.name",
+      host_ip:"host.ip",
+      user_name:"user.name",
+      process_name:"process.name",
+      process_executable:"process.executable",
+      process_command_line:"process.command_line",
+      process_parent_name:"process.parent.name",
+      process_pid:"process.pid",
+      process_args:"process.args",
+      agent_name:"agent.name",
+      source_ip:"source.ip",
+      destination_ip:"destination.ip",
+      event_type:"event.type",
+      user_id:"user.id"
+    `);
 
   if (error) throw error;
 
   return (data ?? []).map((r: any) => ({
-    ts: r.timestamp,
-    user_name: r.user_name,
-    host_name: r.host_name,
-    process_name: r.process_name,
-    process_executable: r.process_executable,
-    process_command_line: r.process_command_line,
-    process_parent_name: r.process_parent_name,
+    ...r,
+    ts: r.timestamp, // used for "timestamp" in ruleEngine
   })) as TrafficRow[];
 }
-
 
 
 /* ===== Sumatorio por binario (solo los que estén en rules) ===== */
@@ -151,7 +74,7 @@ async function getBinariesAndCounts() {
   );
 
   const items = bins.map(bin => {
-    // 🔧 FIX: compara con .trim() para cada regla
+    // Compara con .trim() para cada regla
     const rulesForBin = rules.filter(r => String(r.binary ?? "").trim().toLowerCase() === bin.toLowerCase());
 
     let sum = 0;
@@ -166,7 +89,6 @@ async function getBinariesAndCounts() {
   items.sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
   return items;
 }
-
 
 /* ===== Página principal ===== */
 export default async function HomePage() {
@@ -197,6 +119,7 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+      <HomeStixFooter />
     </main>
   );
 }

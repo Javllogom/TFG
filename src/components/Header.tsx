@@ -5,10 +5,10 @@ import Link from "next/link";
 export default function Header() {
   const menuItems = [
     { name: "Inicio", href: "/" },
-    { name: "Cargar Fichero", href: "/upload" },
+    { name: "Cargar Base de Datos", href: "/database" },
     { name: "Cómo Funciona", href: "/funcionamiento" },
-    { name: "Documentación", href: "/docs" },
     { name: "Estadísticas", href: "/estadisticas" },
+    { name: "Stix Corner", href: "/stcorner" },
   ];
 
   return (

@@ -1,38 +1,190 @@
-'use server';
+"use server";
 
-import { supabaseServer } from '@/lib/supabase';
+import { supabaseServer } from "@/lib/supabase";
+import fs from "fs/promises";
+import path from "path";
+import { randomUUID } from "crypto";
 
-// Types you update from the drawer
-export type RuleUpdatePayload = {
+const DEFAULT_COLUMNS = [
+  "timestamp",
+  "user.name",
+  "host.name",
+  "process.executable",
+  "process.command_line",
+  "process.parent.name",
+];
+
+type RulePayload = {
   title: string;
   rule: string;
-  description: string;
+  description?: string;
   columns: string[];
 };
 
-/**
- * Update a rule row in DB.
- * Priority match by id, else by (binary, title) EXACT (untrimmed).
- * Returns number of updated rows.
- */
+type RuleMatch = {
+  id?: string;
+  matchBinary: string;
+  matchTitle: string;
+};
+
 export async function updateRuleInDb(
-  payload: RuleUpdatePayload,
-  opts: { id?: string | null; matchBinary: string; matchTitle: string }
-): Promise<number> {
-  const sb = supabaseServer();
+  payload: RulePayload,
+  match: RuleMatch
+) {
+  const supabase = supabaseServer();
 
-  let q = sb.from('rules').update(payload);
+  const columnsToStore =
+    Array.isArray(payload.columns) && payload.columns.length > 0
+      ? payload.columns
+      : DEFAULT_COLUMNS;
 
-  if (opts.id) {
-    q = q.eq('id', opts.id);
+  const updateData = {
+    title: payload.title.trim(),
+    rule: payload.rule.trim(),
+    description: (payload.description ?? "").trim(),
+    columns: columnsToStore,
+  };
+
+  let query = supabase.from("rules").update(updateData);
+
+  if (match.id) {
+    query = query.eq("id", match.id);
   } else {
-    // exact DB values (untrimmed) to avoid trailing-space mismatches
-    q = q.eq('binary', opts.matchBinary).eq('title', opts.matchTitle);
+    query = query
+      .eq("binary", match.matchBinary)
+      .eq("title", match.matchTitle);
   }
 
-  // Ask PostgREST to return updated rows to verify success
-  const { error, data } = await q.select();
-  if (error) throw error;
+  const { data, error } = await query.select("*").limit(1);
 
-  return Array.isArray(data) ? data.length : 0;
+  if (error) throw error;
+  return data?.[0] ?? null;
 }
+function escapeForRegex(input: string): string {
+  return input.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
+}
+
+
+function bumpManifestVersion(oldVersion: string | undefined, nowIso: string): string {
+  const today = nowIso.slice(0, 10).replace(/-/g, "."); // YYYY.MM.DD
+  if (oldVersion && oldVersion.startsWith(today)) {
+    const m = oldVersion.match(/-(\d+)$/);
+    const n = m ? parseInt(m[1], 10) + 1 : 2;
+    return `${today}-${n}`;
+  }
+  return `${today}-1`;
+}
+
+export async function exportBinaryToStix(binary: string) {
+  const supabase = supabaseServer();
+
+  const { data, error } = await supabase
+    .from("rules")
+    .select("binary, title, rule, description, link")
+    .ilike("binary", `%${binary}%`);
+
+  if (error) {
+    console.error("Error loading rules for STIX export:", error);
+    throw error;
+  }
+
+  const rules = data ?? [];
+  const now = new Date().toISOString();
+
+  const bundle = {
+    type: "bundle",
+    id: `bundle--${randomUUID()}`,
+    objects: rules.map((r: any) => ({
+      type: "indicator",
+      spec_version: "2.1",
+      id: `indicator--${randomUUID()}`,
+      created: now,
+      modified: now,
+      name: r.title || `${r.binary} rule`,
+      description: r.description ?? "",
+      indicator_types: ["malicious-activity"],
+      pattern: `[process:command_line MATCHES '^.*${escapeForRegex(
+        r.rule ?? ""
+      )}.*$']`,
+      pattern_type: "stix",
+      pattern_version: "2.1",
+      valid_from: now,
+      labels: ["windows", "lolbin", String(r.binary ?? "").toLowerCase()],
+      external_references: r.link
+        ? [
+          {
+            source_name: "rule_source",
+            url: r.link,
+          },
+        ]
+        : [],
+    })),
+  };
+
+  const projectRoot = process.cwd();
+  const publicDir = path.join(projectRoot, "public");
+  const stixDir = path.join(publicDir, "stix");
+  await fs.mkdir(stixDir, { recursive: true });
+
+  const safeBinaryName = (binary.endsWith(".exe") ? binary : `${binary}.exe`).replace(
+    /[\\/:*?"<>|]/g,
+    "_"
+  );
+  const bundleFileName = `${safeBinaryName}.bundle.json`;
+  const bundlePath = path.join(stixDir, bundleFileName);
+
+  console.log("Writing STIX bundle to:", bundlePath);
+  await fs.writeFile(bundlePath, JSON.stringify(bundle, null, 2), "utf8");
+
+  // manifest en public/stix
+  const manifestPath = path.join(stixDir, "manifest.json");
+  console.log("Reading manifest from:", manifestPath);
+
+  let manifest: any | null = null;
+  try {
+    const raw = await fs.readFile(manifestPath, "utf8");
+    manifest = JSON.parse(raw);
+  } catch {
+    console.warn("manifest.json not found or invalid, will create a new one");
+  }
+
+  const binaryKey = safeBinaryName;
+  const relPath = `/stix/${bundleFileName}`;
+  const entry = {
+    binary: binaryKey,
+    path: relPath,
+    count: rules.length,
+    modified: now,
+  };
+
+  if (!manifest) {
+    manifest = {
+      version: bumpManifestVersion(undefined, now),
+      namespace: "binboard",
+      bundles: [entry],
+    };
+  } else {
+    if (!Array.isArray(manifest.bundles)) manifest.bundles = [];
+
+    manifest.version = bumpManifestVersion(manifest.version, now);
+    manifest.namespace = manifest.namespace || "binboard";
+
+    const idx = manifest.bundles.findIndex((b: any) => b.binary === binaryKey);
+    if (idx >= 0) {
+      manifest.bundles[idx] = entry;
+    } else {
+      manifest.bundles.push(entry);
+    }
+  }
+
+  // sort bundles alphabetically by binary
+  manifest.bundles = [...manifest.bundles].sort((a: any, b: any) =>
+    String(a.binary).localeCompare(String(b.binary), "es", { sensitivity: "base" })
+  );
+
+  console.log("Writing updated manifest to:", manifestPath);
+  await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf8");
+
+  return { path: relPath };
+}
+

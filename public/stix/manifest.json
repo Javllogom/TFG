@@ -1,10 +1,72 @@
 {
-  "version": "2025.10.23-1",
+  "version": "2025.12.12-2",
   "namespace": "binboard",
   "bundles": [
-    { "binary": "AppInstaller.exe", "path": "/stix/AppInstaller.bundle.json", "count": 1, "modified": "2025-10-23T15:19:00Z" },
-    { "binary": "Bitsadmin.exe",    "path": "/stix/Bitsadmin.bundle.json",    "count": 4,  "modified": "2025-10-28T08:30:00Z" }
-   
+    {
+      "binary": "AppInstaller.exe",
+      "path": "/stix/AppInstaller.exe.bundle.json",
+      "count": 1,
+      "modified": "2025-12-12T08:11:41.627Z"
+    },
+    {
+      "binary": "Bitsadmin.exe",
+      "path": "/stix/Bitsadmin.exe.bundle.json",
+      "count": 4,
+      "modified": "2025-12-12T08:11:41.627Z"
+    },
+    {
+      "binary": "CertReq.exe",
+      "path": "/stix/CertReq.exe.bundle.json",
+      "count": 1,
+      "modified": "2025-12-12T08:11:41.627Z"
+    },
+    {
+      "binary": "Certutil.exe",
+      "path": "/stix/Certutil.exe.bundle.json",
+      "count": 12,
+      "modified": "2025-12-12T08:11:41.627Z"
+    },
+    {
+      "binary": "Change.exe",
+      "path": "/stix/Change.exe.bundle.json",
+      "count": 1,
+      "modified": "2025-12-12T08:11:41.627Z"
+    },
+    {
+      "binary": "Cipher.exe",
+      "path": "/stix/Cipher.exe.bundle.json",
+      "count": 1,
+      "modified": "2025-12-12T08:11:41.627Z"
+    },
+    {
+      "binary": "Cmd.exe",
+      "path": "/stix/Cmd.exe.bundle.json",
+      "count": 42,
+      "modified": "2025-12-12T08:11:41.627Z"
+    },
+    {
+      "binary": "CmdKey.exe",
+      "path": "/stix/CmdKey.exe.bundle.json",
+      "count": 1,
+      "modified": "2025-12-12T08:11:41.627Z"
+    },
+    {
+      "binary": "Cmdl32.exe",
+      "path": "/stix/Cmdl32.exe.bundle.json",
+      "count": 2,
+      "modified": "2025-12-12T08:11:41.627Z"
+    },
+    {
+      "binary": "ConfigSecurityPolicy.exe",
+      "path": "/stix/ConfigSecurityPolicy.exe.bundle.json",
+      "count": 1,
+      "modified": "2025-12-12T08:11:41.627Z"
+    },
+    {
+      "binary": "Control.exe",
+      "path": "/stix/Control.exe.bundle.json",
+      "count": 4,
+      "modified": "2025-12-12T08:11:41.627Z"
+    }
   ]
 }
-

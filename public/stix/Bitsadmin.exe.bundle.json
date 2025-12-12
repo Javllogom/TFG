@@ -1,0 +1,114 @@
+{
+  "type": "bundle",
+  "id": "bundle--6229e45e-1dd3-4575-bb35-dcc75f08c5b6",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--9c1ceeca-a43b-4489-81c8-ffc3e6f459b2",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Usage of \"transfer\", \"download\" or \"upload\" parameters",
+      "description": "The following query identifies Microsoft Background Intelligent Transfer Service utility `bitsadmin.exe` using the `transfer` parameter to download a remote object. In addition, look for `download` or `upload` on the command-line, the switches are not required to perform a transfer. Capture any files downloaded. Review the reputation of the IP or domain used. Typically once executed, a follow on command will be used to execute the dropped file. Note that the network connection or file modification events related will not spawn or create from `bitsadmin.exe`, but the artifacts will appear in a parallel process of `svchost.exe` with a command-line similar to `svchost.exe -k netsvcs -s BITS`. It's important to review all parallel and child processes to capture any behaviors and artifacts. In some suspicious and malicious instances, BITS jobs will be created.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name : \"bitsadmin\\.exe\" and process\\.command_line :\"\\*transfer\\*\" and \\(process\\.command_line: \\(\"\\*http\\*\" or \"\\*https\\*\"\\) or \\(process\\.command_line:\\(\"\\*download\\*\" or \"\\*upload\\*\"\\)\\)\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "bitsadmin.exe "
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/splunk/security_content/blob/3f77e24974239fcb7a339080a1a483e6bad84a82/detections/endpoint/bitsadmin_download_file.yml "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--66457a11-c250-4a2c-b417-460d3de2e272",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "IOCs",
+      "description": "Detects potentially malicious behavior involving BITS via bitsadmin.exe. This includes suspicious child processes spawned from bitsadmin.exe, creation of new files, and usage of alternate data streams",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name : \"bitsadmin\\.exe\"\r\n\r\nand process\\.parent\\.name : \\(\"cmd\\.exe\" or \"powershell\\.exe\" or \"explorer\\.exe\" or \"services\\.exe\"\\)\r\n.*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "bitsadmin.exe "
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://lolbas-project.github.io/lolbas/Binaries/Bitsadmin/   "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--8559a83c-a058-4907-8fbc-0b410910919c",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "File download",
+      "description": "Detects usage of bitsadmin downloading a file",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.name : \"bitsadmin\\.exe\" and \\(process\\.command_line : \"\\* /transfer  \\*\" or \\(process\\.command_line : \"\\* /create \\*\" and process\\.command_line : \"\\* /addfile \\*\" and process\\.command_line : \"\\*http\\*\"\\)\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "bitsadmin.exe "
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_bitsadmin_download.yml  "
+        }
+      ]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--f7d20729-309e-4493-9412-6bab552f4844",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Persistance behaviour and remote downloads",
+      "description": "BITS will allow you to schedule a command to execute after a successful download to notify you that the job is finished. When the job runs on the system the command specified in the BITS job will be executed. This can be abused by actors to create a backdoor within the system and for persistence. It will be chained in a BITS job to schedule the download of malware/additional binaries and execute the program after being downloaded",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.command_line : \"\\*bitsadmin\\*\"\r\nand \\(\r\n    \\(process\\.command_line : \"\\*SetNotifyCmdLine\\*\" and \\(process\\.command_line : \"\\*%COMSPEC%\\*\" or process\\.command_line : \"\\*cmd\\.exe\\*\" or process\\.command_line : \"\\*regsvr32\\.exe\\*\"\\)\\)\r\n  or\r\n    \\(process\\.command_line : \"\\*Addfile\\*\" and \\(process\\.command_line : \"\\*http:\\*\" or process\\.command_line : \"\\*https:\\*\" or process\\.command_line : \"\\*ftp:\\*\" or process\\.command_line : \"\\*ftps:\\*\"\\)\\)\r\n  or\r\n    \\(process\\.command_line : \"\\* /transfer \\*\" and \\(process\\.command_line : \"\\*http\\*\" or process\\.command_line : \"\\*https\\*\"\\)\\)\r\n\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "bitsadmin.exe "
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_bitsadmin_potential_persistence.yml  "
+        }
+      ]
+    }
+  ]
+}

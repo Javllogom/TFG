@@ -1,0 +1,33 @@
+{
+  "type": "bundle",
+  "id": "bundle--31905c3b-ae30-4475-b777-50766753a7af",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--c4136507-a180-4b34-93cb-9bb828bd504e",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "Suspicious execution which can be abused to download files ",
+      "description": "Detects a suspicious certreq execution taken from the LOLBAS examples, which can be abused to download (small) files",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*\\(process\\.name : \\(\\*certreq\\.exe or \\*CertReq\\.exe\\) or process\\.executable : \\(\\*certreq\\.exe or \\*CertReq\\.exe\\)\\) and \\(process\\.command_line : \\(\\*-Post\\* and \\*-config\\* and \\*http\\* and \\(\\*windows\\* or \\*Windows\\*\\) and \\*win\\.ini\\* \\)\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "certreq.exe "
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_lolbin_susp_certreq_download.yml  "
+        }
+      ]
+    }
+  ]
+}

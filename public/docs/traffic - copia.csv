@@ -1,0 +1,2 @@
+timestamp;event.id;host.name;host.ip;user.name;process.name;process.executable;process.command_line;process.parent.name;process.pid;process.args;agent.name;source.ip;destination.ip;event.type;user.id
+2025-10-15T09:10:00Z;evt-uTLD-001;host-21;;javi;bitsadmin.exe;C:\Windows\System32\bitsadmin.exe;bitsadmin /transfer job1 https://updates.sfx.ms/file.bin;explorer.exe;;;;;;;

@@ -1,0 +1,33 @@
+{
+  "type": "bundle",
+  "id": "bundle--37e26ab3-e44d-4683-82b5-5e3bf7bcff59",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--a4876d63-1bcb-4e4c-93b0-eacb0ecba335",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "File, credentials or data exfiltration ",
+      "description": "Upload file, credentials or data exfiltration with Binary part of Windows Defender",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*process\\.command_line : \\(\\*ConfigSecurityPolicy\\.exe\\) or process\\.executable: \\(\\*ConfigSecurityPolicy\\.exe\\) or file\\.name: \\(\\*ConfigSecurityPolicy\\.exe\\) and process\\.command_line : \\(\"\\*https://\\*\" or \"\\*http://\\*\" or \"\\*ftp://\\*\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "configsecuritypolicy.exe "
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_lolbin_configsecuritypolicy.yml "
+        }
+      ]
+    }
+  ]
+}

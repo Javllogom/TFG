@@ -1,0 +1,33 @@
+{
+  "type": "bundle",
+  "id": "bundle--388b8caf-8b7a-4f6d-88dd-d6db731e2a00",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--abb263f6-157f-4bae-b6f5-0d22cdaab93f",
+      "created": "2025-12-12T08:11:41.627Z",
+      "modified": "2025-12-12T08:11:41.627Z",
+      "name": "CmdKey.exe",
+      "description": "Detects usage of cmdkey to look for cached credentials on the system",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[process:command_line MATCHES '^.*\\(process\\.name : \"\\*cmdkey\\.exe\" or process\\.executable : \"\\*cmdkey\\.exe\"\\) and process\\.command_line : \\(\"\\*-l\\*\" or \"\\*/l\\*\"\\).*$']",
+      "pattern_type": "stix",
+      "pattern_version": "2.1",
+      "valid_from": "2025-12-12T08:11:41.627Z",
+      "labels": [
+        "windows",
+        "lolbin",
+        "cmdkey.exe"
+      ],
+      "external_references": [
+        {
+          "source_name": "rule_source",
+          "url": "https://github.com/SigmaHQ/sigma/blob/62d4fd26b05f4d81973e7c8e80d7c1a0c6a29d0e/rules/windows/process_creation/proc_creation_win_cmdkey_recon.yml "
+        }
+      ]
+    }
+  ]
+}

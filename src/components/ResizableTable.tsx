@@ -18,25 +18,26 @@ export default function ResizableTable({
   // Drag state
   const dragRef = useRef<{ col: number; startX: number; startW: number } | null>(null);
 
-  // Scrollable wrapper (kept for layout; rails are anchored to the table itself)
+  // Scrollable wrapper
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
-  // Table + TH refs to compute rail positions based on real DOM geometry
+  // Table + TH refs to compute rail positions
   const tableRef = useRef<HTMLTableElement | null>(null);
   const thRefs = useRef<(HTMLTableHeaderCellElement | null)[]>([]);
   const [handlerLefts, setHandlerLefts] = useState<number[]>([]);
+  const [overlayHeight, setOverlayHeight] = useState<number>(0);
 
   // Reset widths only when number of columns changes
   useEffect(() => {
-    setWidths((prev) => (prev.length === columns.length ? prev : columns.map(() => 180)));
+    setWidths(prev => (prev.length === columns.length ? prev : columns.map(() => 180)));
   }, [columns.length]);
 
-  // Compute total width so the table can grow and enable horizontal scroll naturally
+  // Total width to allow horizontal scroll
   const totalWidth = useMemo(() => widths.reduce((a, b) => a + b, 0), [widths]);
 
   // Start dragging a specific column border
   const startDrag = (i: number, e: React.MouseEvent | MouseEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // prevent text selection during drag
     const clientX = (e as MouseEvent).clientX ?? (e as any).nativeEvent?.clientX;
     dragRef.current = { col: i, startX: clientX, startW: widths[i] };
     window.addEventListener('mousemove', onMove);
@@ -48,7 +49,7 @@ export default function ResizableTable({
     const d = dragRef.current;
     if (!d) return;
     const dx = e.clientX - d.startX;
-    setWidths((w) => {
+    setWidths(w => {
       const next = [...w];
       next[d.col] = Math.max(minColWidth, d.startW + dx);
       return next;
@@ -60,6 +61,8 @@ export default function ResizableTable({
     dragRef.current = null;
     window.removeEventListener('mousemove', onMove);
     window.removeEventListener('mouseup', onUp);
+    // After drag, recompute rails in case widths changed a lot
+    computeRails();
   };
 
   // Cleanup listeners if component unmounts mid-drag
@@ -71,32 +74,47 @@ export default function ResizableTable({
   }, []);
 
   // Support both dot.notation and snake_case lookup
-  const lowerCols = useMemo(() => columns.map((c) => c.toLowerCase()), [columns]);
-  const snakeCols = useMemo(() => columns.map((c) => c.toLowerCase().replace(/\./g, '_')), [columns]);
+  const lowerCols = useMemo(() => columns.map(c => c.toLowerCase()), [columns]);
+  const snakeCols = useMemo(() => columns.map(c => c.toLowerCase().replace(/\./g, '_')), [columns]);
 
-  // Recompute rail positions by measuring each <th> right edge relative to the table
-  useEffect(() => {
+  // Compute rails: place each rail at right edge of <th> minus current scrollLeft of wrapper
+  const computeRails = () => {
     const tbl = tableRef.current;
+    const wrap = wrapRef.current;
     const ths = thRefs.current;
-    if (!tbl || !ths.length) return;
+    if (!tbl || !wrap || !ths.length) return;
 
-    const compute = () => {
-      const tRect = tbl.getBoundingClientRect();
-      // rails for all but the last column
-      const lefts = ths.slice(0, -1).map((th) => {
-        if (!th) return 0;
-        const r = th.getBoundingClientRect();
-        // position relative to table's left — robust to horizontal scroll
-        return r.right - tRect.left;
-      });
-      setHandlerLefts(lefts);
-    };
+    const scroll = wrap.scrollLeft;
+    const lefts = ths.slice(0, -1).map(th => {
+      if (!th) return 0;
+      // right edge within the table (offsetLeft is relative to the table)
+      const rightInTable = th.offsetLeft + th.offsetWidth;
+      // position inside the wrapper viewport (table scrolls horizontally)
+      return rightInTable - scroll;
+    });
 
-    compute();
-    // Recompute on window resize (scrollbars/fonts/layout changes)
-    window.addEventListener('resize', compute);
-    return () => window.removeEventListener('resize', compute);
+    setHandlerLefts(lefts);
+    setOverlayHeight(tbl.offsetHeight);
+  };
+
+  // Recompute rails on first render, width changes, row count changes, and table resize
+  useEffect(() => {
+    computeRails();
   }, [columns, widths, rows.length]);
+
+  // Recompute on horizontal scroll and window resize
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+    const onScroll = () => computeRails();
+    wrap.addEventListener('scroll', onScroll, { passive: true });
+    const onResize = () => computeRails();
+    window.addEventListener('resize', onResize);
+    return () => {
+      wrap.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
   return (
     <div
@@ -105,23 +123,26 @@ export default function ResizableTable({
     >
       <table
         ref={tableRef}
-        className="bb-table table-fixed border-collapse relative"
+        className="bb-table table-fixed border-collapse"
         style={{ minWidth: totalWidth }}
       >
-        <thead>
+        {/* make the whole header row sticky instead of each <th> */}
+        <thead className="sticky top-0 z-20 bg-[#135B0A] border-y border-white">
           <tr>
             {columns.map((col, i) => (
               <th
-                key={`${col}-${i}`} // keep key unique even if column name repeats
-                ref={(el) => { thRefs.current[i] = el; }} // store each <th> to measure its right edge
-                className="sticky top-0 z-20 text-left text-white font-semibold border-y border-l border-r border-white bg-[#135B0A]"
+                key={`${col}-${i}`}
+                ref={(el) => { thRefs.current[i] = el; }}
+                className="text-left text-white font-semibold border-b border-l border-r border-white bg-[#135B0A]"
                 style={{ width: widths[i], padding: '6px 8px' }}
               >
+
                 <div className="whitespace-nowrap overflow-hidden text-ellipsis">{col}</div>
               </th>
             ))}
           </tr>
         </thead>
+
 
         <tbody>
           {rows.length > 0 ? (
@@ -129,18 +150,18 @@ export default function ResizableTable({
               <tr key={rIdx}>
                 {columns.map((col, cIdx) => {
                   // locate by exact or snake_case (case-insensitive)
-                  const key =
-                    Object.keys(entry).find((k) => k.toLowerCase() === lowerCols[cIdx]) ??
-                    Object.keys(entry).find((k) => k.toLowerCase() === snakeCols[cIdx]);
+                  const k =
+                    Object.keys(entry).find(k => k.toLowerCase() === lowerCols[cIdx]) ??
+                    Object.keys(entry).find(k => k.toLowerCase() === snakeCols[cIdx]);
 
                   const val =
-                    key !== undefined
-                      ? (typeof entry[key] === 'string' ? entry[key] : String(entry[key] ?? ''))
+                    k !== undefined
+                      ? (typeof entry[k] === 'string' ? entry[k] : String(entry[k] ?? ''))
                       : '';
 
                   return (
                     <td
-                      key={`${col}-${cIdx}`} // ensure unique keys per cell
+                      key={`${col}-${cIdx}`} // unique per cell
                       className={[
                         'text-white',
                         'border-l border-r border-white',
@@ -169,26 +190,29 @@ export default function ResizableTable({
             </tr>
           )}
         </tbody>
-
-        {/* === Resize rails overlay (inside the table so it scrolls with content) === */}
-        <div className="pointer-events-none absolute inset-0">
-          {handlerLefts.map((left, i) => (
-            <div
-              key={`handler-${i}`}
-              onMouseDown={(e) => startDrag(i, e as any)}
-              className="absolute top-0 z-30 pointer-events-auto"
-              style={{
-                left: left - 3,  // center 6px rail on the border
-                width: 6,
-                height: '100%',
-                background: 'transparent',
-                cursor: 'col-resize',
-              }}
-              aria-hidden
-            />
-          ))}
-        </div>
       </table>
+
+      {/* === Resize rails overlay (sibling of table to avoid hydration issues) === */}
+      <div
+        className="pointer-events-none absolute left-0 top-0"
+        style={{ height: overlayHeight, width: '100%' }}
+      >
+        {handlerLefts.map((left, i) => (
+          <div
+            key={`handler-${i}`}
+            onMouseDown={(e) => startDrag(i, e as any)}
+            className="absolute top-0 z-30 pointer-events-auto"
+            style={{
+              left: left - 3,  // center 6px rail on the border
+              width: 6,
+              height: '100%',
+              background: 'transparent',
+              cursor: 'col-resize',
+            }}
+            aria-hidden
+          />
+        ))}
+      </div>
     </div>
   );
 }
