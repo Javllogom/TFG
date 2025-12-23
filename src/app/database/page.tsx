@@ -1,8 +1,30 @@
-import DatabaseConfigForm from "./DatabaseConfigForm";
+'use client'; // Marca el archivo como cliente
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // Cambiado a next/navigation
+import { checkAdmin } from "@/lib/protectedRoute";  // Importa la función checkAdmin
+import DatabaseConfigForm from "./DatabaseConfigForm"; // Importa el formulario de configuración
 
 export default function DatabasePage() {
-  const currentUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  const hasAnonKey = !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const router = useRouter();
+  const [currentUrl, setCurrentUrl] = useState<string | null>(null); // Estado para la URL de Supabase
+  const [hasAnonKey, setHasAnonKey] = useState<boolean>(false); // Estado para verificar si la anon key está configurada
+
+  useEffect(() => {
+    async function verifyAccess() {
+      try {
+        await checkAdmin();  // Verificar si el usuario es admin
+      } catch (error) {
+        // Si no es admin, redirigir a login o a una página de error
+        router.push("/login");
+      }
+    }
+
+    verifyAccess();
+
+    // Obtener la URL y la anon key desde las variables de entorno
+    setCurrentUrl(process.env.NEXT_PUBLIC_SUPABASE_URL || null);
+    setHasAnonKey(!!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  }, [router]);
 
   return (
     <main className="min-h-screen bg-[#F5F4CB] px-6 py-10">

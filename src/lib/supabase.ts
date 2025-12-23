@@ -15,3 +15,17 @@ export function supabaseServer() {
   });
   return _supabase!;
 }
+
+export async function getUserRole(userId: string) {
+  const { data, error } = await supabaseServer()
+    .from("users")  // Asegúrate de tener esta tabla
+    .select("role")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching user role:", error);
+    return null; // O lanza un error si lo prefieres
+  }
+  return data?.role;
+}

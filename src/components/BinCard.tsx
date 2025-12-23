@@ -29,47 +29,49 @@ export default function BinCard({
       ].join(" ")}
     >
       <div className="flex items-center gap-3 min-w-0">
-        {/* exe pill */}
         <div className="flex-none rounded-lg bg-[#0B3D06] px-2 py-1 text-xs font-semibold">
           exe
         </div>
 
-        {/* content */}
         {isWide ? (
-          <div className="min-w-0 flex-1 grid grid-cols-[minmax(100px,300px)_1px_1fr] items-center gap-4">
-            {/* Title column (fixed area) */}
+          <div
+            className={[
+              "min-w-0 flex-1 grid items-center gap-4",
+              description
+                ? "grid-cols-[minmax(100px,300px)_1px_1fr]"
+                : "grid-cols-[minmax(100px,1fr)]",
+            ].join(" ")}
+          >
             <div className="min-w-0">
               <div className="font-bold text-2xl leading-tight truncate" title={name}>
                 {name}
               </div>
             </div>
 
-            {/* Separator (fixed X position because of grid template) */}
-            <div className="self-stretch w-px bg-[#F5F4CB]/40" />
-
-            {/* Description (2 lines max, then ellipsis) */}
-            <div
-              className="min-w-0 text-sm text-[#F5F4CB]/90 leading-snug"
-              style={{
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-              }}
-              title={description ?? ""}
-            >
-              {description ??
-                "Texto provisional: descripción breve del binario y su posible abuso."}
-            </div>
+            {description ? (
+              <>
+                <div className="self-stretch w-px bg-[#F5F4CB]/40" />
+                <div
+                  className="min-w-0 text-sm text-[#F5F4CB]/90 leading-snug"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                  title={description}
+                >
+                  {description}
+                </div>
+              </>
+            ) : null}
           </div>
         ) : (
           <div className="min-w-0 flex-1">
             <div
               className={[
-                "font-bold truncate",
-                isCompact
-                  ? "text-[clamp(11px,1.0vw,16px)]"
-                  : "text-lg",
+                "font-semibold truncate leading-tight",
+                isCompact ? "text-[clamp(13px,1.1vw,16px)]" : "text-lg",
               ].join(" ")}
               title={name}
             >
@@ -78,7 +80,6 @@ export default function BinCard({
           </div>
         )}
 
-        {/* count badge (never shrink / never deform) */}
         <div
           className={[
             "flex-none shrink-0",
