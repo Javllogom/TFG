@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase";
 import { verifyPassword, newSessionToken, hashToken } from "@/lib/auth";
+import { cookies } from "next/headers";
 
 function cookieDays() {
   const n = Number(process.env.AUTH_COOKIE_DAYS ?? "7");
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
 
   const { data: user, error } = await supabase
     .from("users")
-    .select("id, email, role, password_hash")
+    .select("id, email, username, role, password_hash")
     .eq("email", email)
     .maybeSingle();
 
@@ -63,8 +64,9 @@ export async function POST(req: Request) {
   const name = process.env.AUTH_COOKIE_NAME ?? "bb_session";
 
   const res = NextResponse.json({
-    user: { id: user.id, email: user.email, role: user.role },
+    user: { id: user.id, email: user.email, username: (user as any).username, role: user.role },
   });
+
 
   res.cookies.set(name, token, {
     httpOnly: true,

@@ -4,6 +4,9 @@ import { supabaseServer } from "@/lib/supabase";
 import fs from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
+import { requireAdmin } from "@/lib/protectedRoute";
+
+
 
 const DEFAULT_COLUMNS = [
   "timestamp",
@@ -28,37 +31,42 @@ type RuleMatch = {
 };
 
 export async function updateRuleInDb(
-  payload: RulePayload,
-  match: RuleMatch
+  
+  payload: {
+    title: string;
+    rule: string;
+    description?: string;
+    columns: string[];
+  },
+  match: {
+    id?: string;
+    matchBinary: string;
+    matchTitle: string;
+  }
 ) {
+  // 🔒 BLOQUEO REAL
+  await requireAdmin();
+
   const supabase = supabaseServer();
 
-  const columnsToStore =
-    Array.isArray(payload.columns) && payload.columns.length > 0
-      ? payload.columns
-      : DEFAULT_COLUMNS;
+  const { data, error } = await supabase
+    .from("rules")
+    .update({
+      title: payload.title,
+      rule: payload.rule,
+      description: payload.description,
+      columns: payload.columns,
+    })
+    .eq("binary", match.matchBinary)
+    .eq("title", match.matchTitle)
+    .select()
+    .single();
 
-  const updateData = {
-    title: payload.title.trim(),
-    rule: payload.rule.trim(),
-    description: (payload.description ?? "").trim(),
-    columns: columnsToStore,
-  };
-
-  let query = supabase.from("rules").update(updateData);
-
-  if (match.id) {
-    query = query.eq("id", match.id);
-  } else {
-    query = query
-      .eq("binary", match.matchBinary)
-      .eq("title", match.matchTitle);
+  if (error) {
+    throw new Error(error.message);
   }
 
-  const { data, error } = await query.select("*").limit(1);
-
-  if (error) throw error;
-  return data?.[0] ?? null;
+  return data;
 }
 function escapeForRegex(input: string): string {
   return input.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
@@ -76,6 +84,7 @@ function bumpManifestVersion(oldVersion: string | undefined, nowIso: string): st
 }
 
 export async function exportBinaryToStix(binary: string) {
+  await requireAdmin();
   const supabase = supabaseServer();
 
   const { data, error } = await supabase

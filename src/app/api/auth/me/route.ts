@@ -35,9 +35,10 @@ export async function GET() {
 
   const { data: user } = await supabase
     .from("users")
-    .select("id, email, role")
+    .select("id, email, username, role")
     .eq("id", session.user_id)
     .single();
+
 
   return NextResponse.json(
     { user: user ?? null },

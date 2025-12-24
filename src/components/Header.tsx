@@ -7,8 +7,10 @@ import Image from "next/image";
 type User = {
   id: number;
   email: string;
+  username: string;
   role: string;
 };
+
 
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
@@ -39,9 +41,12 @@ export default function Header() {
   }, []);
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-    window.dispatchEvent(new Event("auth-changed"));
-  };
+  await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+  window.dispatchEvent(new Event("auth-changed"));
+  window.location.href = "/"; // ⬅️ fuerza navegación y re-evalúa guards
+};
+
+
 
   const username = user?.email.split("@")[0];
 
@@ -63,8 +68,11 @@ export default function Header() {
             </>
           ) : (
             <div className="flex items-center gap-4 bg-[#3B7F4A] px-4 py-2 rounded-full">
-              <span className="font-bold">👤 {username}</span>
-              <button onClick={handleLogout} className="text-sm underline hover:text-[#F7F5D7]">
+              <span className="font-bold">👤 {user.username}</span>
+              <button
+                onClick={handleLogout}
+                className="text-sm underline hover:text-[#F7F5D7] cursor-pointer"
+              >
                 Cerrar sesión
               </button>
             </div>

@@ -2,7 +2,8 @@
 /* Drawer to edit a rule (title, rule, description, columns) */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { updateRuleInDb } from "@/app/bin/[binary]/actions";
-
+import AccessDeniedModal from "@/components/AccessDeniedModal";
+import { useMe } from "@/lib/useMe";
 
 
 
@@ -41,6 +42,15 @@ export default function RuleSettings({
     const [columns, setColumns] = useState<string[]>(() => (Array.isArray(initial.columns) ? initial.columns : []));
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { isAdmin, loading } = useMe();
+    const [denyOpen, setDenyOpen] = useState(false);
+
+    useEffect(() => {
+        if (open && !loading && !isAdmin) {
+            setDenyOpen(true);
+            onClose();
+        }
+    }, [open, loading, isAdmin, onClose]);
 
     // --- drag & drop reordering for columns ---
 
@@ -168,43 +178,51 @@ export default function RuleSettings({
     }
 
     async function handleSave() {
-  try {
-    setSaving(true);
-    setError(null);
+        if (!isAdmin) {
+            setError("Acceso denegado.");
+            return;
+        }
 
-    // Build payload with the current in-drawer state
-    const payload = {
-      title: title.trim(),
-      rule: rule.trim(),
-      description: (description ?? '').trim(),
-      // 👇 this preserves the visual order of the columns
-      columns: columns.map((c) => c.trim()).filter(Boolean),
-    };
+        try {
+            setSaving(true);
+            setError(null);
 
-    // Call server action to persist in Supabase
-    const updated = await updateRuleInDb(payload, {
-      id: initial.id ?? undefined,
-      matchBinary: initial.matchBinary,
-      matchTitle: initial.matchTitle,
-    });
+            // Build payload with the current in-drawer state
+            const payload = {
+                title: title.trim(),
+                rule: rule.trim(),
+                description: (description ?? '').trim(),
+                // 👇 this preserves the visual order of the columns
+                columns: columns.map((c) => c.trim()).filter(Boolean),
+            };
 
-    if (!updated) {
-      throw new Error('No rows were updated (check matchBinary/matchTitle).');
+            // Call server action to persist in Supabase
+            const updated = await updateRuleInDb(payload, {
+                id: initial.id ?? undefined,
+                matchBinary: initial.matchBinary,
+                matchTitle: initial.matchTitle,
+            });
+
+            if (!updated) {
+                throw new Error('No rows were updated (check matchBinary/matchTitle).');
+            }
+
+            // Let parent refresh its own state (including column order)
+            onSaved?.({
+                ...initial,
+                ...payload,
+            });
+
+            onClose();
+        } catch (e: any) {
+            const msg = e?.message ?? "Save failed";
+            if (msg === "Forbidden") {
+                // abre modal de acceso denegado
+            } else {
+                setError(msg);
+            }
+        }
     }
-
-    // Let parent refresh its own state (including column order)
-    onSaved?.({
-      ...initial,
-      ...payload,
-    });
-
-    onClose();
-  } catch (e: any) {
-    setError(e?.message ?? 'Save failed');
-  } finally {
-    setSaving(false);
-  }
-}
 
 
 
@@ -402,6 +420,10 @@ export default function RuleSettings({
                 </div>
 
             </aside>
+            {denyOpen ? (
+                <AccessDeniedModal message="Acceso denegado: solo administradores pueden editar reglas." />
+            ) : null}
+
         </>
     );
 }

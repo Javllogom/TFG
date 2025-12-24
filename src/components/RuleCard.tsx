@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import ResizableTable from "@/components/ResizableTable";
 import RuleSettings from "@/components/RuleSettings";
+import AccessDeniedModal from "@/components/AccessDeniedModal";
 import { buildPredicate } from "@/lib/ruleEngine";
 
 const REVERSE_SNAKE: Record<string, string> = {
@@ -40,6 +41,8 @@ type RuleCardProps = {
   showEmpty?: boolean;
 };
 
+type MeUser = { role: "admin" | "user" };
+
 export default function RuleCard({
   initialRule,
   allRows,
@@ -50,6 +53,35 @@ export default function RuleCard({
   const [description, setDescription] = useState(initialRule.description ?? "");
   const [columns, setColumns] = useState<string[]>(initialRule.columns);
   const [open, setOpen] = useState(false);
+
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [meLoaded, setMeLoaded] = useState(false);
+  const [denyOpen, setDenyOpen] = useState(false);
+
+  useEffect(() => {
+    async function loadMe() {
+      setMeLoaded(false);
+      try {
+        const res = await fetch("/api/auth/me", {
+          method: "GET",
+          cache: "no-store",
+          credentials: "include",
+        });
+        const data = await res.json().catch(() => ({}));
+        const role = (data?.user as MeUser | null)?.role;
+        setIsAdmin(role === "admin");
+      } catch {
+        setIsAdmin(false);
+      } finally {
+        setMeLoaded(true);
+      }
+    }
+
+    loadMe();
+    const onAuth = () => loadMe();
+    window.addEventListener("auth-changed", onAuth);
+    return () => window.removeEventListener("auth-changed", onAuth);
+  }, []);
 
   useEffect(() => {
     console.log("=== RuleCard mount ===", initialRule.title);
@@ -71,66 +103,81 @@ export default function RuleCard({
       }
     }
 
-    const opts = Array.from(common).map(
-      (k) => REVERSE_SNAKE[k] ?? k.replace(/_/g, ".")
-    );
-
+    const opts = Array.from(common).map((k) => REVERSE_SNAKE[k] ?? k.replace(/_/g, "."));
     return Array.from(new Set(opts)).sort();
   }, [rows]);
 
-  // Hide card when toggle is off and there are no matches
   if (!showEmpty && rows.length === 0) {
     return null;
   }
 
-  return (
-    <div className="bg-[#135B0A] text-white rounded-lg p-4 shadow-md border border-emerald-950">
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-lg">
-          {title || "(Regla sin título)"}
-        </h2>
+  function onGearClick() {
+    if (!meLoaded) return; // avoids flicker right after load
+    if (!isAdmin) {
+      setDenyOpen(true);
+      return;
+    }
+    setOpen(true);
+  }
 
-        <button
-          onClick={() => setOpen(true)}
-          className="rounded-md p-1 hover:bg-white/10 active:bg:white/20"
-          aria-label="Open settings"
-          title="Open settings"
-        >
-          <Image
-            src="/images/white_gear.png"
-            alt="Rule settings"
-            width={22}
-            height={22}
-            className="opacity-90"
-          />
-        </button>
+  return (
+    <>
+      <div className="bg-[#135B0A] text-white rounded-lg p-4 shadow-md border border-emerald-950">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-lg">{title || "(Regla sin título)"}</h2>
+
+          <button
+            onClick={onGearClick}
+            className="rounded-md p-1 hover:bg-white/10 active:bg-white/20 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            aria-label="Open settings"
+            title="Open settings"
+            disabled={!meLoaded}
+          >
+            <Image
+              src="/images/white_gear.png"
+              alt="Rule settings"
+              width={22}
+              height={22}
+              className="opacity-90"
+            />
+          </button>
+        </div>
+
+        <div className="h-[3px] bg-white/70 rounded-md my-2" />
+
+        <ResizableTable columns={columns} rows={rows} minColWidth={120} />
+
+        <RuleSettings
+          open={open}
+          onClose={() => setOpen(false)}
+          initial={{
+            id: initialRule.id,
+            binary: initialRule.binary,
+            title,
+            rule: ruleText,
+            description,
+            columns,
+            matchBinary: initialRule.matchBinary,
+            matchTitle: initialRule.matchTitle,
+          }}
+          availableColumns={availableColumns}
+          onSaved={(u) => {
+            setTitle(u.title);
+            setRuleText(u.rule);
+            setDescription(u.description ?? "");
+            setColumns(u.columns);
+          }}
+        />
       </div>
 
-      <div className="h-[3px] bg-white/70 rounded-md my-2" />
+      {denyOpen ? (
+        <AccessDeniedModal
+          mode="soft"
+          message="Acceso denegado: solo administradores pueden abrir la configuración de reglas."
+          onClose={() => setDenyOpen(false)}
+        />
+      ) : null}
 
-      <ResizableTable columns={columns} rows={rows} minColWidth={120} />
-
-      <RuleSettings
-        open={open}
-        onClose={() => setOpen(false)}
-        initial={{
-          id: initialRule.id,
-          binary: initialRule.binary,
-          title,
-          rule: ruleText,
-          description,
-          columns,
-          matchBinary: initialRule.matchBinary,
-          matchTitle: initialRule.matchTitle,
-        }}
-        availableColumns={availableColumns}
-        onSaved={(u) => {
-          setTitle(u.title);
-          setRuleText(u.rule);
-          setDescription(u.description ?? "");
-          setColumns(u.columns);
-        }}
-      />
-    </div>
+    </>
   );
 }
