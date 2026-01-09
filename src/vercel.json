@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/record-incidents",
+      "schedule": "0 2 * * *"
+    }
+  ]
+}

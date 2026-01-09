@@ -197,7 +197,7 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <ChartWeekly />
+        <ChartWeekly totalIncidents={totalHits} />
       </section>
 
       <BinGridClient items={itemsWithDesc} />

@@ -18,6 +18,8 @@ type RuleRow = {
 
 type TrafficRow = Record<string, unknown>;
 
+
+
 function toColumns(c: unknown): string[] {
   if (Array.isArray(c)) return c as string[];
   if (typeof c === "string") {

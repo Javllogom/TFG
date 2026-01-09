@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -10,7 +10,6 @@ type User = {
   username: string;
   role: string;
 };
-
 
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
@@ -41,35 +40,53 @@ export default function Header() {
   }, []);
 
   const handleLogout = async () => {
-  await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-  window.dispatchEvent(new Event("auth-changed"));
-  window.location.href = "/"; // ⬅️ fuerza navegación y re-evalúa guards
-};
-
-
-
-  const username = user?.email.split("@")[0];
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    window.dispatchEvent(new Event("auth-changed"));
+    window.location.href = "/";
+  };
 
   return (
     <header className="bg-[#4F9960] border-b-4 border-[#F7F5D7] text-white h-28">
       <div className="w-full flex items-center justify-between h-full">
         <div className="relative h-[115px] w-[230px] flex-shrink-0 ml-10">
-          <Image src="/Logo.png" alt="BinBoard logo" fill className="object-contain" priority />
+          <Image
+            src="/Logo.png"
+            alt="BinBoard logo"
+            fill
+            className="object-contain"
+            priority
+          />
         </div>
 
         <nav className="flex gap-10 text-lg font-semibold items-center pr-10">
-          <Link href="/">Inicio</Link>
-          <Link href="/database">Cargar Base de Datos</Link>
+          <Link href="/" className="hover:underline">
+            Inicio
+          </Link>
+
+          {user ? (
+            <Link href="/database" className="hover:underline">
+              Cargar Base de Datos
+            </Link>
+          ) : null}
+
+          <Link href="/stats" className="hover:underline">
+            Estadísticas
+          </Link>
 
           {!user ? (
             <>
-              <Link href="/login">Iniciar sesión</Link>
-              <Link href="/register">Registrarse</Link>
+              <Link href="/login" className="hover:underline">
+                Iniciar sesión
+              </Link>
+              <Link href="/register" className="hover:underline">
+                Registrarse
+              </Link>
             </>
           ) : (
             <div className="flex items-center gap-4 bg-[#3B7F4A] px-4 py-2 rounded-full">
               <span className="font-bold">👤 {user.username}</span>
               <button
+                type="button"
                 onClick={handleLogout}
                 className="text-sm underline hover:text-[#F7F5D7] cursor-pointer"
               >
