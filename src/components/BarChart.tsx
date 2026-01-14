@@ -3,12 +3,13 @@ type Point = { label: string; value: number };
 export default function BarChart({
   data,
   thinBars = false,
+  xStep,
 }: {
   data: Point[];
   thinBars?: boolean;
+  xStep?: number; // 👈 controla cada cuántas labels se muestran (solo útil en monthly)
 }) {
   const maxRaw = Math.max(...data.map((d) => d.value), 0);
-
   const max = Math.max(maxRaw, 1);
 
   const W = 900;
@@ -36,9 +37,13 @@ export default function BarChart({
   }
 
   function shouldShowXLabel(i: number) {
+    // Semanal: muestra todas
     if (!thinBars) return true;
 
-    // monthly: show 1, 5, 10, 15, 20, 25, last
+    // Mensual: si viene xStep, úsalo (ej: 2 => muestra 01,03,05,...)
+    if (xStep && xStep > 0) return i % xStep === 0;
+
+    // fallback (por si no pasas xStep): 1, 5, 10, 15, 20, 25, último
     const n = i + 1;
     const last = data.length;
     if (n === 1 || n === last) return true;
@@ -114,7 +119,7 @@ export default function BarChart({
 
             <rect x={x} y={y} width={barW} height={h} fill="#166534" rx={2} />
 
-            {/* Value label on top for weekly (looks cleaner) */}
+            {/* Value label on top for weekly */}
             {!thinBars && d.value > 0 ? (
               <text
                 x={x + barW / 2}

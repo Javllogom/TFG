@@ -175,6 +175,11 @@ export default function ChartStats() {
 
             {/* GRAPH */}
             {err ? <p className="text-sm text-red-700 mb-2">{err}</p> : null}
+            <h3 className="text-sm font-semibold text-emerald-950 mb-2">
+                {mode === "weekly"
+                    ? "Incidencias registradas · últimos 7 días"
+                    : `Incidencias registradas · ${new Date(year, month).toLocaleDateString("es-ES", { month: "long", year: "numeric" })}`}
+            </h3>
 
             {loading ? (
                 <p className="text-sm text-emerald-900/70">Cargando…</p>

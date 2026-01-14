@@ -8,6 +8,7 @@ import HomeStixFooter from "./HomeStixFooter";
 import BinGridClient from "./BinGridClient";
 
 
+
 /* ===== Tipos ===== */
 type RuleRow = {
   binary: string;
