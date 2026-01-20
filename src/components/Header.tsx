@@ -73,6 +73,9 @@ export default function Header() {
             Estadísticas
           </Link>
 
+          <Link href="/create">Crear</Link>
+
+
           {!user ? (
             <>
               <Link href="/login" className="hover:underline">
