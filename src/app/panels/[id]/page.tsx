@@ -37,9 +37,9 @@ async function fetchPanelById(id: string): Promise<PanelRow | null> {
   const supabase = supabaseServer();
 
   const { data, error } = await supabase
-    .from("panels")
+    .from("panels_merged")
     .select("id, title, rule, description, link, columns")
-    .eq("id", id)
+    .eq("title", id)
     .maybeSingle();
 
   if (error) throw error;

@@ -154,7 +154,7 @@ export default function PanelsGridClient({
               title="Arrastra para reordenar"
             >
               <Link
-                href={`/panels/${panel.id}`}
+                href={`/panels/${panel.title}`}
                 onClick={(e) => {
                   // If user just dragged, don’t navigate
                   if (didDragRef.current) e.preventDefault();
