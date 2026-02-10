@@ -28,6 +28,18 @@ export async function createPanelInDb(payload: CreatePanelPayload) {
 
   const supabase = supabaseServer();
 
+  // ✅ 1) calcular siguiente sort_order (evita Date.now() y evita overflow)
+  const { data: last, error: lastErr } = await supabase
+    .from("panels")
+    .select("sort_order")
+    .order("sort_order", { ascending: false, nullsFirst: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (lastErr) throw new Error(lastErr.message);
+
+  const nextSort = (last?.sort_order ?? 0) + 1;
+
   const { data, error } = await supabase
     .from("panels")
     .insert({
@@ -37,7 +49,7 @@ export async function createPanelInDb(payload: CreatePanelPayload) {
       link: link || null,
       columns,
       created_by: user.id,
-      sort_order: Date.now(), // ✅ IMPORTANT
+      sort_order: nextSort, // ✅ 2) aquí
     })
     .select()
     .single();

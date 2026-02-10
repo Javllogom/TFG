@@ -63,7 +63,7 @@ export default function Header() {
             Inicio
           </Link>
 
-          {user ? (
+          {user?.role === "admin" ? (
             <Link href="/database" className="hover:underline">
               Cargar Base de Datos
             </Link>
