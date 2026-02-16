@@ -114,13 +114,13 @@ function madridHour(d = new Date()): number {
   return Math.max(0, Math.min(23, parseInt(h, 10) || 0));
 }
 
-export async function upsertHourlyIncidents(dayISO: string, hour: number, incidents: number) {
+export async function upsertHourlyIncidents(date: Date, dayISO: string, dow: number, hour: number, incidents: number) {
   const supabase = supabaseServer();
 
   const { error } = await supabase
     .from("hourly_incidents")
     .upsert(
-      { day: dayISO, hour, incidents, created_at: new Date().toISOString() },
+      { ts_hour: date.toISOString(), day: dayISO, dow, hour, incidents, created_at: new Date().toISOString() },
       { onConflict: "day,hour" }
     );
 
@@ -261,17 +261,16 @@ export async function recordTodayIncidents() {
 
 // ✅ Graba incidencias del "heatmap" cada hora en punto (hora Madrid)
 export async function recordCurrentHourIncidents() {
-  const day = madridDayISO(new Date());
-  const hour = madridHour(new Date()); // 0..23 en Europe/Madrid
-
+  const date = new Date();
+  const day = madridDayISO(date);
+  const hour = madridHour(date); // 0..23 en Europe/Madrid
   // Igual que Home: numeritos por binario
   const binItems = await getBinariesAndCountsCurrent();
-
   // Total global
   const totalIncidents = binItems.reduce((acc, b) => acc + (b.count ?? 0), 0);
-
   // Persistimos UNA celda (day,hour) para el heatmap
-  await upsertHourlyIncidents(day, hour, totalIncidents);
+  const dow = new Date().getDay(); // 0..6 dom..sáb (para no grabar nada el domingo, por ejemplo)
+  await upsertHourlyIncidents(date, day, dow, hour, totalIncidents);
 
   return { day, hour, incidents: totalIncidents };
 }
