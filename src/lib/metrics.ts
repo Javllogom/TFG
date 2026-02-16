@@ -129,7 +129,7 @@ export async function upsertHourlyIncidents(dayISO: string, hour: number, incide
 
 
 
-function madridDayISO(d = new Date()): string {
+export function madridDayISO(d = new Date()): string {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Madrid",
     year: "numeric",
