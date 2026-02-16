@@ -5,80 +5,70 @@ import { supabaseServer } from "@/lib/supabase";
 
 type RangeKey = "7d" | "30d";
 
-function startDateFor(range: RangeKey) {
-  const now = new Date();
-  const d = new Date(now);
-  d.setDate(now.getDate() - (range === "7d" ? 7 : 30));
-  return d;
+function madridDayISO(d = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Madrid",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d);
+
+  const y = parts.find((p) => p.type === "year")?.value;
+  const m = parts.find((p) => p.type === "month")?.value;
+  const da = parts.find((p) => p.type === "day")?.value;
+  return `${y}-${m}-${da}`;
 }
 
-function madridWeekday(d: Date): number {
-  // 0=Sun ... 6=Sat
-  const parts = new Intl.DateTimeFormat("en-CA", {
+function subMadridDaysISO(n: number): string[] {
+  const base = new Date();
+  const out: string[] = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(base);
+    d.setDate(base.getDate() - i);
+    out.push(madridDayISO(d));
+  }
+  return out;
+}
+
+// 0=Lun ... 6=Dom (para tu UI)
+function dayOfWeekIndexMadrid(dayISO: string): number {
+  const d = new Date(`${dayISO}T12:00:00Z`);
+  const wd = new Intl.DateTimeFormat("en-US", {
     timeZone: "Europe/Madrid",
     weekday: "short",
-  }).formatToParts(d);
-
-  const wd = (parts.find((p) => p.type === "weekday")?.value ?? "").toLowerCase();
-  const map: Record<string, number> = {
-    sun: 0,
-    mon: 1,
-    tue: 2,
-    wed: 3,
-    thu: 4,
-    fri: 5,
-    sat: 6,
-  };
+  }).format(d);
+  // en-US: Mon,Tue,Wed,Thu,Fri,Sat,Sun
+  const map: Record<string, number> = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
   return map[wd] ?? 0;
-}
-
-function madridHour(d: Date): number {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Madrid",
-    hour: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(d);
-
-  return parseInt(parts.find((p) => p.type === "hour")?.value ?? "0", 10);
 }
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const range = (searchParams.get("range") ?? "7d") as RangeKey;
+  const daysCount = range === "30d" ? 30 : 7;
 
-  if (!["7d", "30d"].includes(range)) {
-    return NextResponse.json({ ok: false, error: "range inválido" }, { status: 400 });
-  }
+  const days = subMadridDaysISO(daysCount);
 
   const supabase = supabaseServer();
-  const start = startDateFor(range);
-
   const { data, error } = await supabase
-    .from("traffic")
-    .select("timestamp")
-    .gte("timestamp", start.toISOString());
+    .from("hourly_incidents")
+    .select("day, hour, incidents")
+    .in("day", days);
 
-  if (error) {
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+
+  const matrix = Array.from({ length: 7 }, () => Array(24).fill(0));
+
+  for (const r of data ?? []) {
+    const dayIdx = dayOfWeekIndexMadrid(r.day);
+    const hour = Number(r.hour);
+    if (hour >= 0 && hour <= 23) {
+      matrix[dayIdx][hour] += Number(r.incidents) || 0; // suma por si hay varias semanas/mes
+    }
   }
 
-  // matrix[weekday][hour] -> weekday: 1..6 + 0 last (Mon..Sat + Sun)
-  const matrix: number[][] = Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => 0));
+  let max = 0;
+  for (const row of matrix) for (const v of row) max = Math.max(max, v);
 
-  for (const row of data ?? []) {
-    const ts = new Date((row as any).timestamp);
-    const wd = madridWeekday(ts); // 0..6
-    const h = madridHour(ts); // 0..23
-
-    // reorder to Mon..Sun in UI (Mon=0..Sun=6)
-    const uiDay = wd === 0 ? 6 : wd - 1;
-    matrix[uiDay][h] += 1;
-  }
-
-  const max = matrix.reduce((acc, r) => Math.max(acc, ...r), 0);
-
-  return NextResponse.json(
-    { ok: true, range, matrix, max },
-    { headers: { "Cache-Control": "no-store" } }
-  );
+  return NextResponse.json({ ok: true, range, matrix, max }, { headers: { "Cache-Control": "no-store" } });
 }

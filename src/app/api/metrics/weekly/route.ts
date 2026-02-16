@@ -6,6 +6,7 @@ import { supabaseServer } from "@/lib/supabase";
 export async function GET() {
   const supabase = supabaseServer();
 
+  // Trae últimos 7 días (incluido hoy) en orden
   const { data, error } = await supabase
     .from("daily_incidents")
     .select("day, incidents")
@@ -16,8 +17,9 @@ export async function GET() {
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(
-    { ok: true, points: (data ?? []).reverse() },
-    { headers: { "Cache-Control": "no-store" } }
-  );
+  const points = (data ?? [])
+    .map((r) => ({ day: r.day, incidents: r.incidents }))
+    .reverse();
+
+  return NextResponse.json({ ok: true, points }, { headers: { "Cache-Control": "no-store" } });
 }

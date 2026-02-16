@@ -1,7 +1,7 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { recordTodayIncidents } from "@/lib/metrics";
+import { recordCurrentHourIncidents } from "@/lib/metrics";
 
 const secret = process.env.CRON_SECRET;
 
@@ -12,6 +12,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
-  const res = await recordTodayIncidents();
-  return NextResponse.json({ ok: true, ...res }, { headers: { "Cache-Control": "no-store" } });
+  const res = await recordCurrentHourIncidents();
+  return NextResponse.json(
+    { ok: true, ...res },
+    { headers: { "Cache-Control": "no-store" } }
+  );
 }
