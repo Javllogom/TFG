@@ -6,7 +6,7 @@ import LineChartBins from "@/components/LineChartBins";
 
 
 type RangeKey = "24h" | "7d" | "30d";
-type ApiPoint = { x: string; y: number };
+type ApiPoint = { x?: string | null; y: number };
 
 export default function BinaryTrend() {
   const [bins, setBins] = useState<string[]>([]);
@@ -54,11 +54,26 @@ export default function BinaryTrend() {
   }, [binary, range]);
 
   const chartData = useMemo(() => {
+    // Filtra puntos inválidos (sin x)
+    const safe = (points ?? []).filter(
+      (p) => typeof p?.x === "string" && (p.x as string).length >= 10
+    ) as Array<{ x: string; y: number }>;
+
     if (range === "24h") {
-      return points.map((p) => ({ label: p.x.slice(11, 16), value: p.y })); // HH:00
+      // Espera ISO tipo: 2026-02-18T13:00:00Z o similar
+      return safe.map((p) => ({
+        label: p.x.length >= 16 ? p.x.slice(11, 16) : p.x,
+        value: p.y,
+      }));
     }
-    return points.map((p) => ({ label: p.x.slice(8, 10), value: p.y })); // DD
+
+    // 7d / 30d: esperamos YYYY-MM-DD
+    return safe.map((p) => ({
+      label: p.x.slice(8, 10),
+      value: p.y,
+    }));
   }, [points, range]);
+
 
   const title = useMemo(() => {
     if (!binary) return "Evolución de incidencias";
@@ -87,7 +102,6 @@ export default function BinaryTrend() {
 
           <div className="flex rounded-lg overflow-hidden border border-emerald-900/20">
             {[
-              { k: "24h", label: "24h" },
               { k: "7d", label: "Semana" },
               { k: "30d", label: "Mes" },
             ].map((x) => (
