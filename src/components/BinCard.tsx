@@ -8,6 +8,22 @@ type Props = {
   description?: string;
 };
 
+function badgeColors(count: number) {
+  if (count <= 0) {
+    return { bg: "#f0f0f0", fg: "#000000" };
+  }
+
+  const MAX = 20;
+  const t = Math.min(count, MAX) / MAX;
+  const hue = 50 - 50 * t;
+  const bg = `hsl(${hue} 70% 75%)`;
+
+  const fg = t > 0.65 ? "#111111" : "#111111";
+
+  return { bg, fg };
+}
+
+
 export default function BinCard({
   name,
   count,
@@ -17,6 +33,9 @@ export default function BinCard({
 }: Props) {
   const isCompact = variant === "compact";
   const isWide = variant === "wide";
+  const badge = badgeColors(count);
+
+
 
   return (
     <Link
@@ -86,12 +105,14 @@ export default function BinCard({
             "w-10 h-10 aspect-square rounded-full",
             "grid place-items-center",
             "font-bold text-sm",
-            count > 0 ? "bg-[#E58A7B] text-black" : "bg-white text-black",
+            "border border-black/15",
           ].join(" ")}
+          style={{ backgroundColor: badge.bg, color: badge.fg }}
           aria-label={`hits ${count}`}
         >
           {count}
         </div>
+
       </div>
     </Link>
   );
