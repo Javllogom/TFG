@@ -99,19 +99,32 @@ export default function BinCard({
           </div>
         )}
 
-        <div
-          className={[
-            "flex-none shrink-0",
-            "w-10 h-10 aspect-square rounded-full",
-            "grid place-items-center",
-            "font-bold text-sm",
-            "border border-black/15",
-          ].join(" ")}
-          style={{ backgroundColor: badge.bg, color: badge.fg }}
-          aria-label={`hits ${count}`}
-        >
-          {count}
-        </div>
+        {(() => {
+          const badgeColor = (count: number) => {
+            if (count <= 0) return { bg: "#FFFFFF", fg: "#000000" };
+            const MAX = 20;
+            const t = Math.max(0, Math.min(1, count / MAX));
+            const hue = 55 * (1 - t);
+            const bg = `hsl(${hue} 85% 65%)`;
+            return { bg, fg: "#000000" };
+          };
+          const { bg, fg } = badgeColor(count);
+          return (
+            <div
+              className={[
+          "flex-none shrink-0",
+          "w-10 h-10 aspect-square rounded-full",
+          "grid place-items-center",
+          "font-bold text-sm",
+          "border border-emerald-950/20",
+              ].join(" ")}
+              style={{ backgroundColor: bg, color: fg }}
+              aria-label={`hits ${count}`}
+            >
+              {count}
+            </div>
+          );
+        })()}
 
       </div>
     </Link>
