@@ -115,13 +115,6 @@ export default function ChartWeekly({
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-semibold text-emerald-900">{title}</h3>
 
-        <button
-          onClick={recordToday}
-          disabled={recording}
-          className="rounded-lg bg-[#135B0A] text-[#F5F4CB] px-3 py-2 text-sm hover:opacity-90 disabled:opacity-50"
-        >
-          {recording ? "Registrando…" : "Recordar hoy"}
-        </button>
       </div>
 
       {loading && <p className="text-sm text-emerald-900/70 mb-2">Cargando…</p>}
